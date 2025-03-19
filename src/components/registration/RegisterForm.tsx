@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, Upload, AlertCircle, ChevronRight, ChevronLeft, Loader2, ToggleRight } from "lucide-react";
+import { Check, Upload, AlertCircle, ChevronRight, ChevronLeft, Loader2, ToggleRight, CreditCard, User, Bookmark, FileCheck, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +22,15 @@ const steps = [
   "Membership Details",
   "Membership Oath",
   "Registration Payment",
+];
+
+// Step icons for visual representation
+const stepIcons = [
+  <User size={20} />,
+  <Bookmark size={20} />,
+  <FileCheck size={20} />,
+  <Check size={20} />,
+  <CreditCard size={20} />
 ];
 
 const RegisterForm = () => {
@@ -59,6 +67,7 @@ const RegisterForm = () => {
     paymentMethod: "EFT",
     paymentAmount: "100",
     photoUrl: "",
+    paymentCompleted: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,6 +75,7 @@ const RegisterForm = () => {
   const [isIDValid, setIsIDValid] = useState(false);
   const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
   const [validationEnabled, setValidationEnabled] = useState(true);
+  const [submissionComplete, setSubmissionComplete] = useState(false);
 
   // Handle ID Number validation and auto-populate
   useEffect(() => {
@@ -214,9 +224,10 @@ const RegisterForm = () => {
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handle form submission
+  // Handle form submission - modified to not automatically redirect
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -224,38 +235,53 @@ const RegisterForm = () => {
       if (validateStep()) {
         setIsLoading(true);
         
-        // Simulate API call
+        // Simulate payment processing
         setTimeout(() => {
           const membershipNumber = generateMembershipNumber();
           const today = new Date().toISOString().split('T')[0];
           
-          // Register the user
-          login(
-            {
-              id: Math.random().toString(36).substring(7),
-              ...formData,
-              membershipNumber,
-              joinDate: today,
-            },
-            "dummy-token"
-          );
+          // Mark submission as complete - this doesn't automatically log the user in
+          setSubmissionComplete(true);
           
           // Show success message
           toast({
-            title: "Registration Successful",
-            description: "Your membership has been created. Redirecting to your membership card.",
+            title: "Payment Successful",
+            description: "Your membership payment has been processed. You can now login to access your account.",
           });
           
-          // Redirect to membership card
-          setTimeout(() => {
-            setIsLoading(false);
-            navigate("/membership-card");
-          }, 1500);
+          // End loading state
+          setIsLoading(false);
+          
+          // Here we set paymentCompleted to true but don't auto-redirect
+          setFormData(prev => ({
+            ...prev,
+            paymentCompleted: true,
+          }));
+          
         }, 2000);
       }
     } else {
       handleNext();
     }
+  };
+
+  // Handle login after payment completion - separate action from form submission
+  const handleLoginAfterPayment = () => {
+    const membershipNumber = generateMembershipNumber();
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Now we actually log the user in and navigate
+    login(
+      {
+        id: Math.random().toString(36).substring(7),
+        ...formData,
+        membershipNumber,
+        joinDate: today,
+      },
+      "dummy-token"
+    );
+    
+    navigate("/membership-card");
   };
 
   // Motion variants for animation
@@ -277,741 +303,488 @@ const RegisterForm = () => {
           id="validation-toggle"
           checked={validationEnabled}
           onCheckedChange={setValidationEnabled}
-          className="data-[state=checked]:bg-green-600"
+          className="data-[state=checked]:bg-primary-600"
         />
         <span className="text-xs text-mkneutral-300 ml-1">
           {validationEnabled ? 'On' : 'Off'}
         </span>
       </div>
 
-      {/* Progress Steps */}
-      <div className="flex justify-between mb-8 md:mb-12 overflow-hidden rounded-xl shadow-md bg-white border border-mkneutral-100">
-        {steps.map((step, index) => (
-          <div 
-            key={step} 
-            className={`flex-1 flex items-center justify-center py-4 px-2 text-sm font-medium transition-all duration-300
-              ${currentStep === index 
-                ? "bg-green-50 text-green-700 border-b-4 border-green-500" 
-                : currentStep > index 
-                ? "bg-cream-50 text-green-600" 
-                : "bg-cream-50 text-mkneutral-500"}
-              ${index > 0 && "border-l border-mkneutral-100"}
-            `}
-          >
-            <div className="hidden sm:block">{step}</div>
-            <div className="sm:hidden text-xs">
-              {index + 1}. {step.split(' ')[0]}
+      {/* Payment Success Screen */}
+      {submissionComplete ? (
+        <Card className="shadow-lg border-mkneutral-200 overflow-hidden rounded-xl">
+          <div className="bg-gradient-to-r from-primary-600 to-primary-700 py-6 text-center">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
+              <Check className="h-8 w-8 text-primary-600" />
             </div>
+            <h2 className="text-2xl text-white font-medium">
+              Registration Complete
+            </h2>
           </div>
-        ))}
-      </div>
-
-      {/* Form */}
-      <Card className="shadow-lg border-mkneutral-200 overflow-hidden rounded-xl">
-        <div className="bg-green-600 py-4 text-center">
-          <h2 className="text-xl text-white font-medium">
-            Join the MK Party
-          </h2>
-        </div>
-        <form onSubmit={handleSubmit} className="p-6 md:p-8">
-          <div className="text-center mb-6">
-            <p className="text-mkneutral-600">Please complete the registration form to become a member.</p>
+          <div className="p-8 text-center">
+            <p className="text-xl font-medium text-mkneutral-700 mb-3">Thank you for joining!</p>
+            <p className="text-mkneutral-500 mb-8">
+              Your membership registration has been successfully processed. You can now access your membership card and benefits.
+            </p>
+            
+            <div className="max-w-md mx-auto p-6 bg-cream-50 rounded-xl mb-8">
+              <h3 className="text-lg font-medium text-mkneutral-800 mb-4">Registration Details</h3>
+              <div className="space-y-2 text-left">
+                <div className="flex justify-between">
+                  <span className="text-mkneutral-500">Name:</span>
+                  <span className="font-medium">{formData.name} {formData.surname}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-mkneutral-500">Email:</span>
+                  <span className="font-medium">{formData.email}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-mkneutral-500">Membership Type:</span>
+                  <span className="font-medium">{formData.membershipType}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-mkneutral-500">Payment Method:</span>
+                  <span className="font-medium">{formData.paymentMethod}</span>
+                </div>
+              </div>
+            </div>
+            
+            <Button 
+              onClick={handleLoginAfterPayment}
+              className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-2.5 rounded-full"
+            >
+              View My Membership Card
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <>
+          {/* Progress Steps - Improved UI */}
+          <div className="flex justify-between mb-8 md:mb-12 overflow-hidden rounded-xl shadow-md bg-white border border-mkneutral-100">
+            {steps.map((step, index) => (
+              <div 
+                key={step} 
+                className={`flex-1 flex items-center justify-center py-4 px-2 text-sm font-medium transition-all duration-300
+                  ${currentStep === index 
+                    ? "bg-primary-50 text-primary-700 border-b-2 border-primary-500" 
+                    : currentStep > index 
+                    ? "bg-cream-50 text-primary-600" 
+                    : "bg-cream-50 text-mkneutral-500"}
+                  ${index > 0 && "border-l border-mkneutral-100"}
+                `}
+              >
+                <div className="hidden sm:flex sm:items-center">
+                  <span className="w-6 h-6 rounded-full bg-mkneutral-100 flex items-center justify-center mr-2 
+                    ${currentStep === index ? "bg-primary-100 text-primary-600" : 
+                     currentStep > index ? "bg-primary-600 text-white" : "bg-mkneutral-100 text-mkneutral-500"}">
+                    {currentStep > index ? <Check size={14} /> : index + 1}
+                  </span>
+                  {step}
+                </div>
+                <div className="sm:hidden flex flex-col items-center">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center mb-1
+                    ${currentStep === index ? "bg-primary-100 text-primary-600" : 
+                     currentStep > index ? "bg-primary-600 text-white" : "bg-mkneutral-100 text-mkneutral-500"}`}>
+                    {currentStep > index ? <Check size={14} /> : stepIcons[index]}
+                  </span>
+                  <span className="text-xs">{step.split(' ')[0]}</span>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Step 1: Personal Details */}
-          {currentStep === 0 && (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="space-y-2">
-                <h2 className="text-2xl font-heading font-medium text-green-600">Personal Details</h2>
-                <p className="text-mkneutral-500">Please enter your personal information</p>
+          {/* Form */}
+          <Card className="shadow-lg border-mkneutral-200 overflow-hidden rounded-xl">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 py-5 text-center">
+              <h2 className="text-xl text-white font-medium">
+                Complete Your Registration
+              </h2>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 md:p-8">
+              <div className="text-center mb-6">
+                <p className="text-mkneutral-600">Please fill out the information below to create your membership</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="idNumber" className="text-mkneutral-700 font-medium">
-                    ID Number <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="idNumber"
-                      name="idNumber"
-                      value={formData.idNumber}
-                      onChange={handleChange}
-                      className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.idNumber ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                      placeholder="Enter your ID number"
-                      maxLength={13}
-                    />
-                    {isIDValid && (
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
-                        <Check size={16} />
-                      </span>
-                    )}
+              {/* Step 1: Personal Details */}
+              {currentStep === 0 && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={variants}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-heading font-medium text-primary-700 flex items-center">
+                      <User size={22} className="mr-2 text-primary-500" /> Personal Details
+                    </h2>
+                    <p className="text-mkneutral-500">Please enter your personal information</p>
                   </div>
-                  {errors.idNumber && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.idNumber}
-                    </p>
-                  )}
-                  {isIDValid && (
-                    <p className="text-xs text-green-500 flex items-center mt-1">
-                      <Check size={12} className="mr-1" /> ID Number validated
-                    </p>
-                  )}
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-mkneutral-700 font-medium">
-                    Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.name ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                    placeholder="Enter your name"
-                  />
-                  {errors.name && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.name}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="surname" className="text-mkneutral-700 font-medium">
-                    Surname <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="surname"
-                    name="surname"
-                    value={formData.surname}
-                    onChange={handleChange}
-                    className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.surname ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                    placeholder="Enter your surname"
-                  />
-                  {errors.surname && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.surname}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth" className="text-mkneutral-700 font-medium">
-                    Date of Birth <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="dateOfBirth"
-                    name="dateOfBirth"
-                    type="date"
-                    value={formData.dateOfBirth}
-                    onChange={handleChange}
-                    className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.dateOfBirth ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                    disabled={isIDValid}
-                  />
-                  {errors.dateOfBirth && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.dateOfBirth}
-                    </p>
-                  )}
-                  {isIDValid && (
-                    <p className="text-xs text-mkneutral-500">Auto-populated from ID Number</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="gender" className="text-mkneutral-700 font-medium">
-                    Gender <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    name="gender"
-                    value={formData.gender}
-                    onValueChange={(value) => handleSelectChange("gender", value)}
-                    disabled={isIDValid}
-                  >
-                    <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.gender ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                      <SelectValue placeholder="Select your gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockOptions.genders.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.gender && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.gender}
-                    </p>
-                  )}
-                  {isIDValid && (
-                    <p className="text-xs text-mkneutral-500">Auto-populated from ID Number</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="race" className="text-mkneutral-700 font-medium">
-                    Race <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    name="race"
-                    value={formData.race}
-                    onValueChange={(value) => handleSelectChange("race", value)}
-                  >
-                    <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.race ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                      <SelectValue placeholder="Select your race" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockOptions.races.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.race && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.race}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="language" className="text-mkneutral-700 font-medium">
-                    Language <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    name="language"
-                    value={formData.language}
-                    onValueChange={(value) => handleSelectChange("language", value)}
-                  >
-                    <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.language ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                      <SelectValue placeholder="Select your language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockOptions.languages.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.language && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.language}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="nationality" className="text-mkneutral-700 font-medium">
-                    Nationality <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    name="nationality"
-                    value={formData.nationality}
-                    onValueChange={(value) => handleSelectChange("nationality", value)}
-                  >
-                    <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.nationality ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                      <SelectValue placeholder="Select your nationality" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockOptions.nationalities.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.nationality && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.nationality}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="employmentStatus" className="text-mkneutral-700 font-medium">
-                    Employment Status <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    name="employmentStatus"
-                    value={formData.employmentStatus}
-                    onValueChange={(value) => handleSelectChange("employmentStatus", value)}
-                  >
-                    <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.employmentStatus ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                      <SelectValue placeholder="Select your employment status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockOptions.employmentStatuses.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.employmentStatus && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.employmentStatus}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="occupation" className="text-mkneutral-700 font-medium">Occupation</Label>
-                  <Input
-                    id="occupation"
-                    name="occupation"
-                    value={formData.occupation}
-                    onChange={handleChange}
-                    className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
-                    placeholder="Enter your occupation"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="disability" className="text-mkneutral-700 font-medium">Disability</Label>
-                  <Select
-                    name="disability"
-                    value={formData.disability}
-                    onValueChange={(value) => handleSelectChange("disability", value)}
-                  >
-                    <SelectTrigger className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm h-12">
-                      <SelectValue placeholder="Do you have a disability?" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockOptions.disabilities.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 2: Contact Details */}
-          {currentStep === 1 && (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="space-y-2 mb-6">
-                <h2 className="text-2xl font-heading font-medium text-green-600">Contact Details</h2>
-                <p className="text-mkneutral-500">We'll use these details to keep you updated</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="cellphone" className="text-mkneutral-700 font-medium">
-                    Cellphone Number <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="cellphone"
-                      name="cellphone"
-                      value={formData.cellphone}
-                      onChange={handleChange}
-                      className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.cellphone ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                      placeholder="(073) 123 4567"
-                      maxLength={10}
-                    />
-                  </div>
-                  {errors.cellphone && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.cellphone}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-mkneutral-700 font-medium">
-                    Email Address <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.email ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                    placeholder="name@example.com"
-                  />
-                  {errors.email && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.email}
-                    </p>
-                  )}
-                </div>
-
-                <div className="md:col-span-2 space-y-2">
-                  <Label htmlFor="address" className="text-mkneutral-700 font-medium">
-                    Residential Address - Line 1 <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className={`form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm ${errors.address ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                    placeholder="Street address"
-                  />
-                  {errors.address && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.address}
-                    </p>
-                  )}
-                </div>
-
-                <div className="md:col-span-2 space-y-2">
-                  <Label htmlFor="addressLine2" className="text-mkneutral-700 font-medium">
-                    Residential Address - Line 2
-                  </Label>
-                  <Input
-                    id="addressLine2"
-                    name="addressLine2"
-                    value={formData.addressLine2}
-                    onChange={handleChange}
-                    className="form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm"
-                    placeholder="Apartment, suite, unit, etc."
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="postalCode" className="text-mkneutral-700 font-medium">
-                    Postal Code
-                  </Label>
-                  <Input
-                    id="postalCode"
-                    name="postalCode"
-                    value={formData.postalCode}
-                    onChange={handleChange}
-                    className="form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm"
-                    placeholder="0000"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="province" className="text-mkneutral-700 font-medium">
-                    Province
-                  </Label>
-                  <Select
-                    name="province"
-                    value={formData.province}
-                    onValueChange={(value) => handleSelectChange("province", value)}
-                  >
-                    <SelectTrigger className="form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm h-12">
-                      <SelectValue placeholder="Select province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", "Limpopo", "Mpumalanga", "Northern Cape", "North West", "Western Cape"].map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-mkneutral-100 bg-cream-50 p-4 rounded-xl">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="emailConfirmation"
-                    checked={formData.emailConfirmation}
-                    onCheckedChange={(checked) => 
-                      handleCheckboxChange("emailConfirmation", checked as boolean)
-                    }
-                    className="rounded border-green-500 text-green-600 focus:ring-green-500/20"
-                  />
-                  <Label htmlFor="emailConfirmation" className="text-sm cursor-pointer text-mkneutral-700">
-                    I would like to receive email updates from MK Party
-                  </Label>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 3: Membership Details */}
-          {currentStep === 2 && (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="space-y-2 mb-6">
-                <h2 className="text-2xl font-heading font-medium text-green-600">Membership Details</h2>
-                <p className="text-mkneutral-500">Help us understand your local context</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="municipality" className="text-mkneutral-700 font-medium">
-                    Municipality
-                  </Label>
-                  <Input
-                    id="municipality"
-                    name="municipality"
-                    value={formData.municipality}
-                    onChange={handleChange}
-                    className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
-                    placeholder="e.g. Johannesburg Metro"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="ward" className="text-mkneutral-700 font-medium">
-                    Ward
-                  </Label>
-                  <Input
-                    id="ward"
-                    name="ward"
-                    value={formData.ward}
-                    onChange={handleChange}
-                    className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
-                    placeholder="e.g. Ward 77"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-2">
-                  <Label htmlFor="votingStation" className="text-mkneutral-700 font-medium">
-                    Voting Station
-                  </Label>
-                  <Input
-                    id="votingStation"
-                    name="votingStation"
-                    value={formData.votingStation}
-                    onChange={handleChange}
-                    className="form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm"
-                    placeholder="Your local voting station"
-                  />
-                </div>
-              </div>
-
-              <div className="p-6 mt-6 border border-green-100 rounded-xl bg-green-50 shadow-sm">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-4">
-                    <Check className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-green-700">Standard Membership</h3>
-                    <p className="text-sm text-green-600">Your selected membership type</p>
-                  </div>
-                </div>
-                <ul className="text-sm space-y-2 text-mkneutral-600 ml-16">
-                  <li className="flex items-start">
-                    <Check size={16} className="text-green-500 mt-0.5 mr-2 shrink-0" />
-                    <span>Access to MK Party membership benefits</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Check size={16} className="text-green-500 mt-0.5 mr-2 shrink-0" />
-                    <span>Digital membership card</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Check size={16} className="text-green-500 mt-0.5 mr-2 shrink-0" />
-                    <span>Regular updates on party activities</span>
-                  </li>
-                </ul>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 4: Membership Oath */}
-          {currentStep === 3 && (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="space-y-2 mb-6">
-                <h2 className="text-2xl font-heading font-medium text-green-600">Membership Oath</h2>
-                <p className="text-mkneutral-500">Please read and accept the MK Party Membership Oath</p>
-              </div>
-
-              <div className="p-6 rounded-lg bg-cream-50 border border-mkneutral-200 space-y-4">
-                <div className="overflow-y-auto max-h-64 p-4 bg-white rounded-md text-mkneutral-800">
-                  <p className="mb-4">
-                    I voluntarily join Umkhonto weSizwe Party as an individual who is committed to abide by and uphold its
-                    constitution, values, objectives, principles, and discipline. I commit that I will never be involved in divisive
-                    and factional activities and programmes that seek to undermine the unity and discipline of the
-                    organisation. I vow to not associate with external forces that seek to destroy and undermine the unity of the
-                    organisation. I will tirelessly work to realise all its aims and objectives. I join the MKP with full knowledge
-                    and understanding that the National High Command and National Officials have the right to terminate my
-                    membership at any given point for political, ideological and organisational reasons and purposes.
-                  </p>
-                  <p>
-                    I join the MKP with full knowledge that I am not entitled to any position of responsibility in the organisation
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="acceptTerms"
-                    checked={formData.acceptTerms}
-                    onCheckedChange={(checked) => 
-                      handleCheckboxChange("acceptTerms", checked as boolean)
-                    }
-                    className={`rounded border-green-500 text-green-500 ${
-                      errors.acceptTerms ? "border-red-500" : ""
-                    }`}
-                  />
-                  <Label htmlFor="acceptTerms" className="text-sm cursor-pointer">
-                    I agree to the MK Party Membership Oath Declaration.
-                  </Label>
-                </div>
-                {errors.acceptTerms && (
-                  <p className="form-error flex items-center text-xs">
-                    <AlertCircle size={12} className="mr-1" /> {errors.acceptTerms}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 5: Payment */}
-          {currentStep === 4 && (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="space-y-2 mb-6">
-                <h2 className="text-2xl font-heading font-medium text-green-600">Registration Payment</h2>
-                <p className="text-mkneutral-500">Support the party with a membership donation</p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6">
-                <div className="p-6 rounded-lg bg-green-50 border border-green-100 space-y-4">
-                  <div className="flex items-center mb-2">
-                    <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center mr-4">
-                      <Check className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-green-700">Membership Fee / Donation</h3>
-                      <p className="text-sm text-green-600">Support the MK Party with your registration</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4 mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="paymentAmount" className="text-mkneutral-700 font-medium">
-                        Donation Amount (Minimum R20) <span className="text-red-500">*</span>
+                      <Label htmlFor="idNumber" className="text-mkneutral-700 font-medium">
+                        ID Number <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-mkneutral-500">R</span>
                         <Input
-                          id="paymentAmount"
-                          name="paymentAmount"
-                          type="number"
-                          min="20"
-                          value={formData.paymentAmount}
+                          id="idNumber"
+                          name="idNumber"
+                          value={formData.idNumber}
                           onChange={handleChange}
-                          className={`form-input rounded-xl bg-white pl-8 border-mkneutral-200 shadow-sm ${errors.paymentAmount ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                          placeholder="100"
+                          className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.idNumber ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                          placeholder="Enter your ID number"
+                          maxLength={13}
                         />
+                        {isIDValid && (
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                            <Check size={16} />
+                          </span>
+                        )}
                       </div>
-                      {errors.paymentAmount && (
+                      {errors.idNumber && (
                         <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.paymentAmount}
+                          <AlertCircle size={12} className="mr-1" /> {errors.idNumber}
+                        </p>
+                      )}
+                      {isIDValid && (
+                        <p className="text-xs text-green-500 flex items-center mt-1">
+                          <Check size={12} className="mr-1" /> ID Number validated
                         </p>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="paymentMethod" className="text-mkneutral-700 font-medium">
-                        Payment Method
+                      <Label htmlFor="name" className="text-mkneutral-700 font-medium">
+                        Name <span className="text-red-500">*</span>
                       </Label>
-                      <RadioGroup 
-                        defaultValue="EFT" 
-                        value={formData.paymentMethod}
-                        onValueChange={(value) => handleSelectChange("paymentMethod", value)}
-                        className="flex flex-col space-y-1"
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.name ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                        placeholder="Enter your name"
+                      />
+                      {errors.name && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="surname" className="text-mkneutral-700 font-medium">
+                        Surname <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="surname"
+                        name="surname"
+                        value={formData.surname}
+                        onChange={handleChange}
+                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.surname ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                        placeholder="Enter your surname"
+                      />
+                      {errors.surname && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.surname}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="dateOfBirth" className="text-mkneutral-700 font-medium">
+                        Date of Birth <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        type="date"
+                        value={formData.dateOfBirth}
+                        onChange={handleChange}
+                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.dateOfBirth ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                        disabled={isIDValid}
+                      />
+                      {errors.dateOfBirth && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.dateOfBirth}
+                        </p>
+                      )}
+                      {isIDValid && (
+                        <p className="text-xs text-mkneutral-500">Auto-populated from ID Number</p>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="gender" className="text-mkneutral-700 font-medium">
+                        Gender <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        name="gender"
+                        value={formData.gender}
+                        onValueChange={(value) => handleSelectChange("gender", value)}
+                        disabled={isIDValid}
                       >
-                        <div className="flex items-center space-x-2 rounded-lg border border-green-100 p-3 bg-white">
-                          <RadioGroupItem value="EFT" id="EFT" className="text-green-600" />
-                          <Label htmlFor="EFT" className="cursor-pointer">Electronic Transfer (EFT)</Label>
-                        </div>
-                        <div className="flex items-center space-x-2 rounded-lg border border-green-100 p-3 bg-white">
-                          <RadioGroupItem value="Card" id="Card" className="text-green-600" />
-                          <Label htmlFor="Card" className="cursor-pointer">Card Payment</Label>
-                        </div>
-                      </RadioGroup>
+                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.gender ? "border-red-500 ring-1 ring-red-500" : ""}`}>
+                          <SelectValue placeholder="Select your gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockOptions.genders.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.gender && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.gender}
+                        </p>
+                      )}
+                      {isIDValid && (
+                        <p className="text-xs text-mkneutral-500">Auto-populated from ID Number</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="race" className="text-mkneutral-700 font-medium">
+                        Race <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        name="race"
+                        value={formData.race}
+                        onValueChange={(value) => handleSelectChange("race", value)}
+                      >
+                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.race ? "border-red-500 ring-1 ring-red-500" : ""}`}>
+                          <SelectValue placeholder="Select your race" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockOptions.races.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.race && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.race}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="language" className="text-mkneutral-700 font-medium">
+                        Language <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        name="language"
+                        value={formData.language}
+                        onValueChange={(value) => handleSelectChange("language", value)}
+                      >
+                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.language ? "border-red-500 ring-1 ring-red-500" : ""}`}>
+                          <SelectValue placeholder="Select your language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockOptions.languages.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.language && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.language}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="nationality" className="text-mkneutral-700 font-medium">
+                        Nationality <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        name="nationality"
+                        value={formData.nationality}
+                        onValueChange={(value) => handleSelectChange("nationality", value)}
+                      >
+                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.nationality ? "border-red-500 ring-1 ring-red-500" : ""}`}>
+                          <SelectValue placeholder="Select your nationality" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockOptions.nationalities.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.nationality && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.nationality}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="employmentStatus" className="text-mkneutral-700 font-medium">
+                        Employment Status <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        name="employmentStatus"
+                        value={formData.employmentStatus}
+                        onValueChange={(value) => handleSelectChange("employmentStatus", value)}
+                      >
+                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.employmentStatus ? "border-red-500 ring-1 ring-red-500" : ""}`}>
+                          <SelectValue placeholder="Select your employment status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockOptions.employmentStatuses.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.employmentStatus && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.employmentStatus}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="occupation" className="text-mkneutral-700 font-medium">Occupation</Label>
+                      <Input
+                        id="occupation"
+                        name="occupation"
+                        value={formData.occupation}
+                        onChange={handleChange}
+                        className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
+                        placeholder="Enter your occupation"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="disability" className="text-mkneutral-700 font-medium">Disability</Label>
+                      <Select
+                        name="disability"
+                        value={formData.disability}
+                        onValueChange={(value) => handleSelectChange("disability", value)}
+                      >
+                        <SelectTrigger className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm h-12">
+                          <SelectValue placeholder="Do you have a disability?" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockOptions.disabilities.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+                </motion.div>
+              )}
 
-          {/* Navigation Buttons */}
-          <div className="mt-8 pt-4 border-t border-mkneutral-100 flex justify-between">
-            {currentStep > 0 ? (
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handlePrevious}
-                className="gap-2 text-mkneutral-600 rounded-xl"
-              >
-                <ChevronLeft size={16} /> Previous
-              </Button>
-            ) : (
-              <div></div>
-            )}
-            {currentStep < steps.length - 1 ? (
-              <Button 
-                type="button" 
-                onClick={handleNext}
-                className="gap-2 bg-green-600 hover:bg-green-700 rounded-xl"
-              >
-                Next <ChevronRight size={16} />
-              </Button>
-            ) : (
-              <Button 
-                type="submit"
-                className="gap-2 bg-green-600 hover:bg-green-700 rounded-xl"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Complete Registration
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </form>
-      </Card>
-    </div>
-  );
-};
+              {/* Step 2: Contact Details */}
+              {currentStep === 1 && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={variants}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-2 mb-6">
+                    <h2 className="text-2xl font-heading font-medium text-primary-700 flex items-center">
+                      <Bookmark size={22} className="mr-2 text-primary-500" /> Contact Details
+                    </h2>
+                    <p className="text-mkneutral-500">We'll use these details to keep you updated</p>
+                  </div>
 
-export default RegisterForm;
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="cellphone" className="text-mkneutral-700 font-medium">
+                        Cellphone Number <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="cellphone"
+                          name="cellphone"
+                          value={formData.cellphone}
+                          onChange={handleChange}
+                          className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.cellphone ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                          placeholder="(073) 123 4567"
+                          maxLength={10}
+                        />
+                      </div>
+                      {errors.cellphone && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.cellphone}
+                        </p>
+                      )}
+                    </div>
 
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-mkneutral-700 font-medium">
+                        Email Address <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.email ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                        placeholder="name@example.com"
+                      />
+                      {errors.email && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.email}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="md:col-span-2 space-y-2">
+                      <Label htmlFor="address" className="text-mkneutral-700 font-medium">
+                        Residential Address - Line 1 <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        className={`form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm ${errors.address ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                        placeholder="Street address"
+                      />
+                      {errors.address && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.address}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="md:col-span-2 space-y-2">
+                      <Label htmlFor="addressLine2" className="text-mkneutral-700 font-medium">
+                        Residential Address - Line 2
+                      </Label>
+                      <Input
+                        id="addressLine2"
+                        name="addressLine2"
+                        value={formData.addressLine2}
+                        onChange={handleChange}
+                        className="form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm"
+                        placeholder="Apartment, suite, unit, etc."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="postalCode" className="text-mkneutral-700 font-medium">
+                        Postal Code
+                      </Label>
+                      <Input
