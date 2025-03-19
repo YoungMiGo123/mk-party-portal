@@ -5,7 +5,7 @@ import {
   User, MessageSquare, CalendarCheck, BarChart3, 
   LogOut, ChevronRight, ExternalLink, Check, Mail,
   MapPin, CreditCard, CheckCircle, XCircle, Clock,
-  Download, Share2, Edit, AlertCircle
+  Download, Share2, Edit, AlertCircle, IdCard
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -26,7 +26,6 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [selectedPollOptions, setSelectedPollOptions] = useState<Record<string, string>>({});
 
-  // Redirect if not authenticated
   if (!isAuthenticated || !user) {
     toast({
       title: "Access Denied",
@@ -36,13 +35,11 @@ const Dashboard = () => {
     return <Navigate to="/login" />;
   }
 
-  // Calculate if membership is expired
   const membershipStartDate = new Date(user.joinDate);
   const membershipExpiryDate = new Date(membershipStartDate);
   membershipExpiryDate.setFullYear(membershipExpiryDate.getFullYear() + 1); // Membership valid for 1 year
   const isExpired = new Date() > membershipExpiryDate;
   
-  // Format date
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
       year: 'numeric', 
@@ -52,7 +49,6 @@ const Dashboard = () => {
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
-  // Share card
   const shareCard = () => {
     if (navigator.share) {
       navigator.share({
@@ -83,7 +79,6 @@ const Dashboard = () => {
     }
   };
 
-  // Submit poll answer
   const submitPollAnswer = (pollId: string) => {
     if (selectedPollOptions[pollId]) {
       toast({
@@ -99,7 +94,6 @@ const Dashboard = () => {
     }
   };
 
-  // RSVP for event
   const rsvpForEvent = (eventId: string) => {
     toast({
       title: "RSVP Successful",
@@ -107,7 +101,6 @@ const Dashboard = () => {
     });
   };
 
-  // Connect on WhatsApp
   const connectWhatsApp = () => {
     toast({
       title: "WhatsApp Redirect",
@@ -116,7 +109,6 @@ const Dashboard = () => {
     window.open("https://wa.me/27123456789", "_blank");
   };
 
-  // Handle chat with Thando
   const [chatMessages, setChatMessages] = useState([
     { sender: "bot", text: "Hello! I'm Thando, your MK Party assistant. How can I help you today?" }
   ]);
@@ -126,10 +118,8 @@ const Dashboard = () => {
     e.preventDefault();
     
     if (newMessage.trim()) {
-      // Add user message
       setChatMessages(prev => [...prev, { sender: "user", text: newMessage }]);
       
-      // Simulate bot response
       setTimeout(() => {
         let botResponse;
         
@@ -175,7 +165,7 @@ const Dashboard = () => {
                 <div className="flex space-x-3">
                   <Link to="/membership-card">
                     <Button variant="outline" className="flex items-center">
-                      <CreditCard size={16} className="mr-2" />
+                      <IdCard size={16} className="mr-2" />
                       View Membership Card
                     </Button>
                   </Link>
@@ -198,14 +188,12 @@ const Dashboard = () => {
             </motion.div>
             
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Sidebar */}
               <div className="lg:col-span-1">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  {/* Profile Summary */}
                   <Card className="mb-6 shadow-glass-sm">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg">Profile Summary</CardTitle>
@@ -253,6 +241,10 @@ const Dashboard = () => {
                           <span className="text-mkneutral-500">Province:</span>
                           <span>{user.province || "Gauteng"}</span>
                         </div>
+                        <div className="flex justify-between">
+                          <span className="text-mkneutral-500">Voting Station:</span>
+                          <span>{user.votingStation || "Local Community Hall"}</span>
+                        </div>
                       </div>
                     </CardContent>
                     <CardFooter className="pt-0">
@@ -263,7 +255,6 @@ const Dashboard = () => {
                     </CardFooter>
                   </Card>
                   
-                  {/* Navigation Tabs (Mobile) */}
                   <div className="lg:hidden mb-6">
                     <TabsList className="w-full grid grid-cols-3">
                       <TabsTrigger 
@@ -293,7 +284,6 @@ const Dashboard = () => {
                     </TabsList>
                   </div>
                   
-                  {/* Navigation Links (Desktop) */}
                   <Card className="shadow-glass-sm hidden lg:block">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg">Dashboard Menu</CardTitle>
@@ -342,17 +332,14 @@ const Dashboard = () => {
                 </motion.div>
               </div>
               
-              {/* Main Content */}
               <div className="lg:col-span-3">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
-                  {/* Profile & Chat Tab */}
                   {activeTab === "profile" && (
                     <div className="space-y-6">
-                      {/* Virtual Membership Card */}
                       <Card className="shadow-glass-sm overflow-hidden">
                         <CardHeader className="pb-2 flex flex-row justify-between items-center">
                           <div>
@@ -406,7 +393,6 @@ const Dashboard = () => {
                         </CardContent>
                       </Card>
 
-                      {/* Membership Status Card */}
                       <Card className={`shadow-glass-sm border-l-4 ${isExpired ? 'border-red-500' : 'border-green-500'}`}>
                         <CardHeader className="pb-2">
                           <CardTitle className="flex items-center">
@@ -473,7 +459,48 @@ const Dashboard = () => {
                         </CardContent>
                       </Card>
 
-                      {/* Profile Details */}
+                      <Card className="bg-blue-50 border-blue-200 shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-blue-800 text-lg flex items-center">
+                            <MapPin size={18} className="mr-2 text-blue-700" />
+                            Voting Registration Information
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-blue-700">
+                          <p className="mb-4">
+                            Your voter registration appears to be valid. Below are your voting details:
+                          </p>
+                          <div className="bg-white/60 rounded-lg p-4 space-y-2 text-blue-900">
+                            <div className="flex justify-between">
+                              <span className="font-medium">Voting Station:</span>
+                              <span>{user.votingStation || "Local Community Hall"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-medium">Ward:</span>
+                              <span>{user.ward || "Ward 42"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-medium">Municipality:</span>
+                              <span>City of Johannesburg</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-medium">Province:</span>
+                              <span>{user.province || "Gauteng"}</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter>
+                          <a 
+                            href="https://www.elections.org.za/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                          >
+                            Visit IEC Website <ExternalLink size={14} className="ml-1" />
+                          </a>
+                        </CardFooter>
+                      </Card>
+
                       <Card className="shadow-glass-sm">
                         <CardHeader className="flex flex-row justify-between items-start">
                           <div>
@@ -506,6 +533,14 @@ const Dashboard = () => {
                                 <label className="text-sm text-mkneutral-500 block mb-1">Gender</label>
                                 <div>{user.gender}</div>
                               </div>
+                              <div>
+                                <label className="text-sm text-mkneutral-500 block mb-1">Race</label>
+                                <div>{user.race}</div>
+                              </div>
+                              <div>
+                                <label className="text-sm text-mkneutral-500 block mb-1">Language</label>
+                                <div>{user.language}</div>
+                              </div>
                             </div>
                             <div className="space-y-4">
                               <div>
@@ -524,51 +559,19 @@ const Dashboard = () => {
                                 <label className="text-sm text-mkneutral-500 block mb-1">Occupation</label>
                                 <div>{user.occupation || "-"}</div>
                               </div>
+                              <div>
+                                <label className="text-sm text-mkneutral-500 block mb-1">Employment Status</label>
+                                <div>{user.employmentStatus}</div>
+                              </div>
+                              <div>
+                                <label className="text-sm text-mkneutral-500 block mb-1">Disability</label>
+                                <div>{user.disability || "None"}</div>
+                              </div>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                       
-                      {/* Voter Information */}
-                      <Card className="bg-blue-50 border-blue-200 shadow-sm">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-blue-800 text-lg flex items-center">
-                            <MapPin size={18} className="mr-2 text-blue-700" />
-                            Voting Registration Information
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-blue-700">
-                          <p className="mb-4">
-                            Your voter registration appears to be valid. Below are your voting details:
-                          </p>
-                          <div className="bg-white/60 rounded-lg p-4 space-y-2 text-blue-900">
-                            <div className="flex justify-between">
-                              <span className="font-medium">Voting Station:</span>
-                              <span>{user.votingStation || "Local Community Hall"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="font-medium">Ward:</span>
-                              <span>{user.ward || "Ward 42"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="font-medium">Municipality:</span>
-                              <span>City of Johannesburg</span>
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter>
-                          <a 
-                            href="https://www.elections.org.za/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                          >
-                            Visit IEC Website <ExternalLink size={14} className="ml-1" />
-                          </a>
-                        </CardFooter>
-                      </Card>
-                      
-                      {/* Interactive Chat (Thando) */}
                       <Card className="shadow-glass-sm overflow-hidden">
                         <CardHeader className="bg-primary/5">
                           <div className="flex items-center">
@@ -617,7 +620,6 @@ const Dashboard = () => {
                     </div>
                   )}
                   
-                  {/* Events Tab */}
                   {activeTab === "events" && (
                     <div className="space-y-6">
                       <Card className="shadow-glass-sm">
@@ -689,7 +691,6 @@ const Dashboard = () => {
                     </div>
                   )}
                   
-                  {/* Polls Tab */}
                   {activeTab === "polls" && (
                     <div className="space-y-6">
                       <Card className="shadow-glass-sm">
