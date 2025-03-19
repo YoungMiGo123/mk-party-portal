@@ -4,7 +4,8 @@ import { Navigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   User, MessageSquare, CalendarCheck, BarChart3, 
-  LogOut, ChevronRight, ExternalLink, Check, Mail 
+  LogOut, ChevronRight, ExternalLink, Check, Mail,
+  MapPin, CreditCard, CheckCircle, XCircle, Clock
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -34,6 +35,12 @@ const Dashboard = () => {
     return <Navigate to="/login" />;
   }
 
+  // Calculate if membership is expired
+  const membershipStartDate = new Date(user.joinDate);
+  const membershipExpiryDate = new Date(membershipStartDate);
+  membershipExpiryDate.setFullYear(membershipExpiryDate.getFullYear() + 1); // Membership valid for 1 year
+  const isExpired = new Date() > membershipExpiryDate;
+  
   // Format date
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -136,7 +143,7 @@ const Dashboard = () => {
                 <div className="flex space-x-3">
                   <Link to="/membership-card">
                     <Button variant="outline" className="flex items-center">
-                      <User size={16} className="mr-2" />
+                      <CreditCard size={16} className="mr-2" />
                       View Membership Card
                     </Button>
                   </Link>
@@ -185,7 +192,19 @@ const Dashboard = () => {
                         <div>
                           <div className="font-medium">{user.name} {user.surname}</div>
                           <div className="text-sm text-mkneutral-500">{user.membershipType} Member</div>
-                          <div className="text-sm text-mkneutral-500">Since {formatDate(user.joinDate)}</div>
+                          <div className="flex items-center text-sm mt-1">
+                            {isExpired ? (
+                              <div className="flex items-center text-red-500">
+                                <XCircle size={14} className="mr-1" />
+                                <span>Expired on {formatDate(membershipExpiryDate.toISOString())}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center text-green-600">
+                                <CheckCircle size={14} className="mr-1" />
+                                <span>Active until {formatDate(membershipExpiryDate.toISOString())}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
@@ -210,6 +229,40 @@ const Dashboard = () => {
                         Connect on WhatsApp
                       </Button>
                     </CardFooter>
+                  </Card>
+                  
+                  {/* Membership Card Preview */}
+                  <Card className="mb-6 shadow-glass-sm overflow-hidden">
+                    <CardHeader className="bg-primary/5 pb-2">
+                      <CardTitle className="flex items-center text-lg">
+                        <CreditCard size={18} className="mr-2 text-primary" />
+                        Membership Card
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="w-full aspect-video relative bg-gradient-to-br from-primary to-primary-800 rounded-lg overflow-hidden shadow-sm">
+                        <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-center">
+                          <div className="text-white font-medium text-xs">MK PARTY</div>
+                          <div className="px-1.5 py-0.5 bg-gold text-xs font-medium rounded">OFFICIAL</div>
+                        </div>
+                        <div className="absolute inset-0 flex flex-col justify-center items-center">
+                          <div className="text-white text-center">
+                            <div className="font-medium text-sm mb-1">{user.name} {user.surname}</div>
+                            <div className="text-xs text-white/80 mb-2">{user.membershipNumber}</div>
+                            {isExpired ? (
+                              <div className="text-xs bg-red-500/80 text-white py-0.5 px-2 rounded-full">EXPIRED</div>
+                            ) : (
+                              <div className="text-xs bg-white/20 text-white py-0.5 px-2 rounded-full">ACTIVE</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-3 text-center">
+                        <Link to="/membership-card" className="text-primary hover:text-primary-700 text-sm font-medium">
+                          View Full Card
+                        </Link>
+                      </div>
+                    </CardContent>
                   </Card>
                   
                   {/* Navigation Tabs (Mobile) */}
@@ -301,6 +354,73 @@ const Dashboard = () => {
                   {/* Profile & Chat Tab */}
                   {activeTab === "profile" && (
                     <div className="space-y-6">
+                      {/* Membership Status Card */}
+                      <Card className={`shadow-glass-sm border-l-4 ${isExpired ? 'border-red-500' : 'border-green-500'}`}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="flex items-center">
+                            {isExpired ? (
+                              <>
+                                <XCircle size={20} className="mr-2 text-red-500" />
+                                <span className="text-red-500">Expired Membership</span>
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle size={20} className="mr-2 text-green-600" />
+                                <span className="text-green-600">Active Membership</span>
+                              </>
+                            )}
+                          </CardTitle>
+                          <CardDescription>
+                            {isExpired 
+                              ? "Your membership has expired and needs to be renewed" 
+                              : "Your membership is active and in good standing"}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="bg-mkneutral-50 p-3 rounded-lg">
+                              <div className="text-xs text-mkneutral-500 mb-1">Member Since</div>
+                              <div className="font-medium flex items-center">
+                                <Clock size={14} className="mr-1 text-mkneutral-400" />
+                                {formatDate(user.joinDate)}
+                              </div>
+                            </div>
+                            <div className="bg-mkneutral-50 p-3 rounded-lg">
+                              <div className="text-xs text-mkneutral-500 mb-1">Status</div>
+                              <div className="font-medium flex items-center">
+                                {isExpired ? (
+                                  <>
+                                    <XCircle size={14} className="mr-1 text-red-500" />
+                                    <span className="text-red-500">Expired</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle size={14} className="mr-1 text-green-600" />
+                                    <span className="text-green-600">Active</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div className="bg-mkneutral-50 p-3 rounded-lg">
+                              <div className="text-xs text-mkneutral-500 mb-1">
+                                {isExpired ? "Expired On" : "Expires On"}
+                              </div>
+                              <div className="font-medium flex items-center">
+                                <Clock size={14} className="mr-1 text-mkneutral-400" />
+                                {formatDate(membershipExpiryDate.toISOString())}
+                              </div>
+                            </div>
+                          </div>
+                          {isExpired && (
+                            <div className="mt-4">
+                              <Button variant="default" className="w-full sm:w-auto">
+                                Renew Membership
+                              </Button>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
                       {/* Profile Details */}
                       <Card className="shadow-glass-sm">
                         <CardHeader>
@@ -354,6 +474,45 @@ const Dashboard = () => {
                         </CardFooter>
                       </Card>
                       
+                      {/* Voter Information */}
+                      <Card className="bg-blue-50 border-blue-200 shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-blue-800 text-lg flex items-center">
+                            <MapPin size={18} className="mr-2 text-blue-700" />
+                            Voting Registration Information
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-blue-700">
+                          <p className="mb-4">
+                            Your voter registration appears to be valid. Below are your voting details:
+                          </p>
+                          <div className="bg-white/60 rounded-lg p-4 space-y-2 text-blue-900">
+                            <div className="flex justify-between">
+                              <span className="font-medium">Voting Station:</span>
+                              <span>{user.votingStation || "Local Community Hall"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-medium">Ward:</span>
+                              <span>{user.ward || "Ward 42"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-medium">Municipality:</span>
+                              <span>City of Johannesburg</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter>
+                          <a 
+                            href="https://www.elections.org.za/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                          >
+                            Visit IEC Website <ExternalLink size={14} className="ml-1" />
+                          </a>
+                        </CardFooter>
+                      </Card>
+                      
                       {/* Interactive Chat (Thando) */}
                       <Card className="shadow-glass-sm overflow-hidden">
                         <CardHeader className="bg-primary/5">
@@ -399,42 +558,6 @@ const Dashboard = () => {
                             </form>
                           </div>
                         </CardContent>
-                      </Card>
-                      
-                      {/* Voter Information Placeholder */}
-                      <Card className="bg-blue-50 border-blue-200 shadow-sm">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-blue-800 text-lg">Voter Registration Information</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-blue-700">
-                          <p className="mb-4">
-                            Your voter registration appears to be valid. Below are your voting details:
-                          </p>
-                          <div className="bg-white/60 rounded-lg p-4 space-y-2 text-blue-900">
-                            <div className="flex justify-between">
-                              <span className="font-medium">Voting Station:</span>
-                              <span>{user.votingStation || "Local Community Hall"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="font-medium">Ward:</span>
-                              <span>{user.ward || "Ward 42"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="font-medium">Municipality:</span>
-                              <span>City of Johannesburg</span>
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter>
-                          <a 
-                            href="https://www.elections.org.za/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                          >
-                            Visit IEC Website <ExternalLink size={14} className="ml-1" />
-                          </a>
-                        </CardFooter>
                       </Card>
                     </div>
                   )}

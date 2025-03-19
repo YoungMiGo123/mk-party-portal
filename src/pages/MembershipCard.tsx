@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Download, Share2, ArrowLeft, QrCode } from "lucide-react";
+import { Download, Share2, ArrowLeft, QrCode, CheckCircle, XCircle, Clock } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,12 @@ const MembershipCard = () => {
     });
     return <Navigate to="/login" />;
   }
+
+  // Calculate if membership is expired
+  const membershipStartDate = new Date(user.joinDate);
+  const membershipExpiryDate = new Date(membershipStartDate);
+  membershipExpiryDate.setFullYear(membershipExpiryDate.getFullYear() + 1); // Membership valid for 1 year
+  const isExpired = new Date() > membershipExpiryDate;
 
   // Format date
   const formatDate = (dateString: string | undefined) => {
@@ -127,6 +133,32 @@ const MembershipCard = () => {
               </p>
             </motion.div>
             
+            {/* Membership Status Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className={`mb-6 p-3 rounded-lg text-center ${
+                isExpired 
+                  ? "bg-red-100 text-red-800 border border-red-200" 
+                  : "bg-green-100 text-green-800 border border-green-200"
+              }`}
+            >
+              <div className="flex items-center justify-center">
+                {isExpired ? (
+                  <>
+                    <XCircle size={18} className="mr-2" />
+                    <span className="font-medium">Your membership expired on {formatDate(membershipExpiryDate.toISOString())}</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={18} className="mr-2" />
+                    <span className="font-medium">Your membership is active until {formatDate(membershipExpiryDate.toISOString())}</span>
+                  </>
+                )}
+              </div>
+            </motion.div>
+            
             {/* Membership Card */}
             <div className="flex flex-col items-center justify-center my-8">
               <motion.div
@@ -138,7 +170,7 @@ const MembershipCard = () => {
                 {/* Card Container */}
                 <div 
                   ref={cardRef}
-                  className="aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-[#0a5c36] to-[#083d24]"
+                  className="aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl relative bg-gradient-to-br from-primary to-primary-700"
                 >
                   {/* Card Pattern */}
                   <div className="absolute inset-0 opacity-10">
@@ -180,8 +212,18 @@ const MembershipCard = () => {
                       <div className="mt-1 text-white/80 text-sm">
                         Member since: {formatDate(user.joinDate)}
                       </div>
-                      <div className="mt-3 inline-block px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm text-xs text-white/90 border border-white/20">
-                        {user.membershipType} Member
+                      <div className="mt-1 text-white/80 text-sm flex items-center">
+                        <Clock size={12} className="mr-1" />
+                        {isExpired ? "Expired: " : "Expires: "}
+                        {formatDate(membershipExpiryDate.toISOString())}
+                      </div>
+                      <div className="mt-3 inline-block px-2 py-1 rounded-full text-xs border border-white/20 
+                        ${isExpired 
+                          ? 'bg-red-500/70 text-white' 
+                          : 'bg-gold/70 text-white'
+                        }`}
+                      >
+                        {isExpired ? "EXPIRED" : `${user.membershipType} MEMBER`}
                       </div>
                     </div>
                   </div>
@@ -209,6 +251,13 @@ const MembershipCard = () => {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Status Badge */}
+                  {isExpired && (
+                    <div className="absolute top-6 right-6 -rotate-12 bg-red-500 text-white text-xs font-bold py-1 px-3 rounded-full border-2 border-white shadow-lg">
+                      EXPIRED
+                    </div>
+                  )}
                   
                   {/* QR Code (placeholder) */}
                   <div className="absolute bottom-6 right-6 w-16 h-16 bg-white rounded-lg p-2">
@@ -256,6 +305,17 @@ const MembershipCard = () => {
                   For security reasons, only a partial ID number is displayed on the card.
                 </p>
                 <p>
+                  {isExpired ? (
+                    <>
+                      Your membership has <strong className="text-red-600">expired</strong>. Please renew your 
+                      membership to continue enjoying member benefits. 
+                    </>
+                  ) : (
+                    <>
+                      Your membership is <strong className="text-green-600">active</strong> and will expire 
+                      on {formatDate(membershipExpiryDate.toISOString())}. 
+                    </>
+                  )}
                   If you need to update your information or have any questions about your 
                   membership, please contact our membership support team at <a href="mailto:membership@mkparty.org" className="text-primary hover:underline">membership@mkparty.org</a>.
                 </p>
