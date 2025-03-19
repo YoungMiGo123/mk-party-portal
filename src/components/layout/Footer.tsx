@@ -1,61 +1,89 @@
 
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Twitter, Youtube } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-mkneutral-50 border-t border-mkneutral-100">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          {/* Logo and Description */}
-          <div className="mb-6 md:mb-0 text-center md:text-left">
-            <Link to="/" className="inline-flex items-center space-x-2 mb-4">
-              <img 
-                src="/logo.svg" 
-                alt="MK Party" 
-                className="h-10 w-auto"
-              />
-              <span className="font-heading text-xl font-medium">MK Party</span>
-            </Link>
-            <p className="text-mkneutral-600 mt-2 max-w-xs">
-              Membership portal for MK Party. Access your membership information and events.
-            </p>
-          </div>
-          
-          {/* Quick Links */}
-          <div className="flex flex-col items-center md:items-end">
-            <div className="flex space-x-4 mb-4">
-              <a href="https://www.facebook.com/mkparty" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-mkneutral-500 hover:text-primary transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="https://twitter.com/MKParty" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-mkneutral-500 hover:text-primary transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href="https://www.instagram.com/mkparty" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-mkneutral-500 hover:text-primary transition-colors">
-                <Instagram size={20} />
-              </a>
+    <footer className="bg-black text-white py-12">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* Left Column - Logo and Contact */}
+          <div className="flex flex-col items-center md:items-start">
+            <div className="mb-4">
+              <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
+              <div className="bg-yellow-500 text-black px-4 py-1 font-medium text-sm">
+                UMKHONTO WESIZWE
+              </div>
             </div>
-            
-            <div className="flex space-x-4 text-sm">
-              <Link to="/login" className="text-mkneutral-600 hover:text-primary transition-colors">
-                Login
-              </Link>
-              <Link to="/register" className="text-mkneutral-600 hover:text-primary transition-colors">
-                Register
-              </Link>
-              <Link to="/events" className="text-mkneutral-600 hover:text-primary transition-colors">
-                Events
-              </Link>
+            <div className="text-sm text-gray-300">
+              info@mkparty.co.za | mkparty.org.za
+            </div>
+          </div>
+
+          {/* Middle Column - Thol'ispane Logo */}
+          <div className="flex justify-center items-center">
+            <img 
+              src="/lovable-uploads/630cd84e-179e-49b5-a940-eb59c0f0b77f.png" 
+              alt="Thol'ispane Logo" 
+              className="h-20" 
+            />
+          </div>
+
+          {/* Right Column - Slogan */}
+          <div className="flex flex-col items-center md:items-end">
+            <div className="border border-white p-4 mb-6 text-center md:text-right max-w-sm">
+              <p className="text-sm">
+                TIME TO RISE UP | ISIKHATHI SOKUVUKA | KE NAKO YA GO TSOGA
+              </p>
+            </div>
+            <p className="text-sm mb-6">info@mkparty.co.za</p>
+            <div className="flex space-x-3">
+              <a 
+                href="https://twitter.com/MKParty" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="bg-green-500 p-3 rounded-full hover:bg-green-600 transition-colors"
+              >
+                <Twitter size={20} className="text-white" />
+              </a>
+              <a 
+                href="https://www.facebook.com/mkparty" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="bg-green-500 p-3 rounded-full hover:bg-green-600 transition-colors"
+              >
+                <Facebook size={20} className="text-white" />
+              </a>
+              <a 
+                href="https://www.youtube.com/mkparty" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="bg-green-500 p-3 rounded-full hover:bg-green-600 transition-colors"
+              >
+                <Youtube size={20} className="text-white" />
+              </a>
             </div>
           </div>
         </div>
-        
-        <div className="border-t border-mkneutral-200 mt-6 pt-6 text-center">
-          <p className="text-mkneutral-500 text-sm">
-            &copy; {currentYear} MK Party. All rights reserved.
+
+        {/* Mission Statement */}
+        <div className="mb-8 text-center md:text-left max-w-4xl mx-auto md:mx-0">
+          <p className="text-sm text-gray-300 leading-relaxed">
+            Celebrating unity, advocating for positive change, and shaping a brighter tomorrow. uMkhonto
+            weSizwe Party is more than a political force; it's a movement dedicated to the people. Explore our
+            vision, mission, and the stories that define us. Read more about our journey and commitment to
+            building a society that truly belongs to all. Join us in the pursuit of progress.
           </p>
+        </div>
+
+        {/* Copyright */}
+        <div className="text-xs text-gray-400 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <p>© COPYRIGHT {currentYear} • MK PARTY • ALL RIGHTS RESERVED</p>
+          <Link to="/cookie-policy" className="text-green-500 hover:underline mt-2 md:mt-0">
+            COOKIE POLICY
+          </Link>
         </div>
       </div>
     </footer>
