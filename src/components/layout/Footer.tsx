@@ -8,7 +8,7 @@ const Footer = () => {
   return (
     <footer className="bg-black text-white py-12">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Left Column - Logo and Contact */}
           <div className="flex flex-col items-center md:items-start">
             <div className="mb-4">
@@ -20,15 +20,6 @@ const Footer = () => {
             <div className="text-sm text-gray-300">
               info@mkparty.co.za | mkparty.org.za
             </div>
-          </div>
-
-          {/* Middle Column - Thol'ispane Logo */}
-          <div className="flex justify-center items-center">
-            <img 
-              src="/lovable-uploads/630cd84e-179e-49b5-a940-eb59c0f0b77f.png" 
-              alt="Thol'ispane Logo" 
-              className="h-20" 
-            />
           </div>
 
           {/* Right Column - Slogan */}
