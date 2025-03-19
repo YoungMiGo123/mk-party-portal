@@ -224,7 +224,6 @@ const RegisterForm = () => {
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Handle form submission - modified to not automatically redirect
@@ -374,9 +373,9 @@ const RegisterForm = () => {
                 `}
               >
                 <div className="hidden sm:flex sm:items-center">
-                  <span className="w-6 h-6 rounded-full bg-mkneutral-100 flex items-center justify-center mr-2 
+                  <span className={`w-6 h-6 rounded-full bg-mkneutral-100 flex items-center justify-center mr-2 
                     ${currentStep === index ? "bg-primary-100 text-primary-600" : 
-                     currentStep > index ? "bg-primary-600 text-white" : "bg-mkneutral-100 text-mkneutral-500"}">
+                     currentStep > index ? "bg-primary-600 text-white" : "bg-mkneutral-100 text-mkneutral-500"}`}>
                     {currentStep > index ? <Check size={14} /> : index + 1}
                   </span>
                   {step}
@@ -788,3 +787,6 @@ const RegisterForm = () => {
                         Postal Code
                       </Label>
                       <Input
+                        id="postalCode"
+                        name="postalCode"
+                        value={
