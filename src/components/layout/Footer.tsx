@@ -13,9 +13,18 @@ const Footer = () => {
           <div className="flex flex-col items-start">
             {/* Logo */}
             <div className="mb-4">
-              <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
-              <div className="bg-gold px-4 py-1 font-medium text-sm">
-                UMKHONTO WESIZWE
+              <div className="flex items-center gap-3 mb-2">
+                <img 
+                  src="/lovable-uploads/e91116c1-e7fb-4dfb-93bb-7b8d5e7f521e.png" 
+                  alt="Tholispane" 
+                  className="h-12" 
+                />
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
+                  <div className="bg-gold px-4 py-1 font-medium text-sm">
+                    UMKHONTO WESIZWE
+                  </div>
+                </div>
               </div>
             </div>
             
