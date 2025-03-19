@@ -38,6 +38,11 @@ const Header = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -82,10 +87,7 @@ const Header = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  logout();
-                  navigate("/");
-                }}
+                onClick={handleLogout}
                 title="Log out"
                 className="rounded-full p-2"
               >
@@ -157,9 +159,8 @@ const Header = () => {
                   </Link>
                   <button
                     onClick={() => {
-                      logout();
                       closeMenu();
-                      navigate("/");
+                      handleLogout();
                     }}
                     className="flex items-center space-x-2 text-lg font-medium py-2 text-red-500"
                   >

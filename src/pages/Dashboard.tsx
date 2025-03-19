@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   User, MessageSquare, CalendarCheck, BarChart3, 
@@ -24,15 +23,11 @@ import VirtualMembershipCard from "@/components/membership/VirtualMembershipCard
 const Dashboard = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   const [selectedPollOptions, setSelectedPollOptions] = useState<Record<string, string>>({});
 
   if (!isAuthenticated || !user) {
-    toast({
-      title: "Access Denied",
-      description: "You need to be logged in to access your dashboard.",
-      variant: "destructive",
-    });
     return <Navigate to="/login" />;
   }
 
@@ -48,6 +43,11 @@ const Dashboard = () => {
       day: 'numeric' 
     };
     return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
   const shareCard = () => {
@@ -142,13 +142,7 @@ const Dashboard = () => {
                   <Button 
                     variant="ghost" 
                     className="text-mkneutral-700 hover:text-red-600 hover:bg-red-50" 
-                    onClick={() => {
-                      logout();
-                      toast({
-                        title: "Logged Out",
-                        description: "You have been successfully logged out.",
-                      });
-                    }}
+                    onClick={handleLogout}
                   >
                     <LogOut size={16} className="mr-2" />
                     Log Out
@@ -694,3 +688,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
