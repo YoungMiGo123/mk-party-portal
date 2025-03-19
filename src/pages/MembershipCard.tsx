@@ -217,7 +217,7 @@ const MembershipCard = () => {
                         {isExpired ? "Expired: " : "Expires: "}
                         {formatDate(membershipExpiryDate.toISOString())}
                       </div>
-                      <div className="mt-3 inline-block px-2 py-1 rounded-full text-xs border border-white/20 
+                      <div className={`mt-3 inline-block px-2 py-1 rounded-full text-xs border border-white/20 
                         ${isExpired 
                           ? 'bg-red-500/70 text-white' 
                           : 'bg-gold/70 text-white'
