@@ -13,7 +13,7 @@ const Footer = () => {
           <div className="flex flex-col items-center md:items-start">
             <div className="mb-4 text-center md:text-left">
               <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
-              <div className="bg-yellow-500 text-black px-4 py-1 font-medium text-sm">
+              <div className="bg-gold px-4 py-1 font-medium text-sm">
                 UMKHONTO WESIZWE
               </div>
             </div>
@@ -35,7 +35,7 @@ const Footer = () => {
                 href="https://twitter.com/MKParty" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="bg-green-600 p-3 rounded-full hover:bg-green-700 transition-colors"
+                className="bg-primary p-3 rounded-full hover:bg-primary-700 transition-colors"
               >
                 <Twitter size={20} className="text-white" />
               </a>
@@ -43,7 +43,7 @@ const Footer = () => {
                 href="https://www.facebook.com/mkparty" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="bg-green-600 p-3 rounded-full hover:bg-green-700 transition-colors"
+                className="bg-primary p-3 rounded-full hover:bg-primary-700 transition-colors"
               >
                 <Facebook size={20} className="text-white" />
               </a>
@@ -51,7 +51,7 @@ const Footer = () => {
                 href="https://www.youtube.com/mkparty" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="bg-green-600 p-3 rounded-full hover:bg-green-700 transition-colors"
+                className="bg-primary p-3 rounded-full hover:bg-primary-700 transition-colors"
               >
                 <Youtube size={20} className="text-white" />
               </a>
@@ -72,7 +72,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="text-xs text-gray-400 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p>© COPYRIGHT {currentYear} • MK PARTY • ALL RIGHTS RESERVED</p>
-          <Link to="/cookie-policy" className="text-green-500 hover:underline mt-2 md:mt-0">
+          <Link to="/cookie-policy" className="text-primary hover:underline mt-2 md:mt-0">
             COOKIE POLICY
           </Link>
         </div>

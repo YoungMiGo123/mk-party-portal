@@ -12,7 +12,7 @@ const Register = () => {
       <main className="flex-grow pt-20 pb-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-green-800">
+            <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-700">
               Member Registration
             </h1>
             <p className="text-mkneutral-500 max-w-2xl mx-auto">

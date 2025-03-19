@@ -40,3 +40,18 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Dev mode positioning */
+.__react_dev_overlay_container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  max-width: 300px !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+}
+
+.__react_dev_overlay_container button,
+.__react_dev_overlay_container a {
+  pointer-events: auto !important;
+}
