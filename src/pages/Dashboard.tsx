@@ -110,37 +110,6 @@ const Dashboard = () => {
     window.open("https://wa.me/27123456789", "_blank");
   };
 
-  const [chatMessages, setChatMessages] = useState([
-    { sender: "bot", text: "Hello! I'm Thando, your MK Party assistant. How can I help you today?" }
-  ]);
-  const [newMessage, setNewMessage] = useState("");
-
-  const sendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (newMessage.trim()) {
-      setChatMessages(prev => [...prev, { sender: "user", text: newMessage }]);
-      
-      setTimeout(() => {
-        let botResponse;
-        
-        if (newMessage.toLowerCase().includes("event")) {
-          botResponse = "We have several upcoming events! Check the Events tab for details or I can help you RSVP.";
-        } else if (newMessage.toLowerCase().includes("membership")) {
-          botResponse = "Your membership is active and in good standing. Your membership number is " + user.membershipNumber;
-        } else if (newMessage.toLowerCase().includes("vote") || newMessage.toLowerCase().includes("voting")) {
-          botResponse = "The next election is approaching. Make sure your voter registration is up to date through the IEC website.";
-        } else {
-          botResponse = "Thank you for your message. Is there anything specific about the MK Party that you'd like to know?";
-        }
-        
-        setChatMessages(prev => [...prev, { sender: "bot", text: botResponse }]);
-      }, 1000);
-      
-      setNewMessage("");
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-mkneutral-50">
       <Header />
@@ -289,7 +258,7 @@ const Dashboard = () => {
                         >
                           <div className="flex items-center">
                             <User size={18} className="mr-3" />
-                            <span>Profile & Chat</span>
+                            <span>Profile</span>
                           </div>
                           <ChevronRight size={16} />
                         </button>
@@ -384,7 +353,7 @@ const Dashboard = () => {
                         </CardContent>
                       </Card>
 
-                      <Card className={`shadow-glass-sm border-l-4 ${isExpired ? 'border-red-500' : 'border-green-500'}`}>
+                      <Card className={`shadow-glass-sm border-l-4 ${isExpired ? 'border-red-500' : 'border-primary'}`}>
                         <CardHeader className="pb-2">
                           <CardTitle className="flex items-center">
                             {isExpired ? (
@@ -394,8 +363,8 @@ const Dashboard = () => {
                               </>
                             ) : (
                               <>
-                                <CheckCircle size={20} className="mr-2 text-green-600" />
-                                <span className="text-green-600">Active Membership</span>
+                                <CheckCircle size={20} className="mr-2 text-primary" />
+                                <span className="text-primary">Active Membership</span>
                               </>
                             )}
                           </CardTitle>
@@ -424,8 +393,8 @@ const Dashboard = () => {
                                   </>
                                 ) : (
                                   <>
-                                    <CheckCircle size={14} className="mr-1 text-green-600" />
-                                    <span className="text-green-600">Active</span>
+                                    <CheckCircle size={14} className="mr-1 text-primary" />
+                                    <span className="text-primary">Active</span>
                                   </>
                                 )}
                               </div>
@@ -450,18 +419,18 @@ const Dashboard = () => {
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-blue-50 border-blue-200 shadow-sm">
+                      <Card className="shadow-glass-sm border-primary/20 border">
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-blue-800 text-lg flex items-center">
-                            <MapPin size={18} className="mr-2 text-blue-700" />
+                          <CardTitle className="text-mkneutral-800 text-lg flex items-center">
+                            <MapPin size={18} className="mr-2 text-primary" />
                             Voting Registration Information
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="text-blue-700">
+                        <CardContent className="text-mkneutral-700">
                           <p className="mb-4">
                             Your voter registration appears to be valid. Below are your voting details:
                           </p>
-                          <div className="bg-white/60 rounded-lg p-4 space-y-2 text-blue-900">
+                          <div className="bg-mkneutral-50/60 rounded-lg p-4 space-y-2 text-mkneutral-800">
                             <div className="flex justify-between">
                               <span className="font-medium">Voting Station:</span>
                               <span>{user.votingStation || "Local Community Hall"}</span>
@@ -485,7 +454,7 @@ const Dashboard = () => {
                             href="https://www.elections.org.za/" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                            className="text-primary hover:text-primary/80 text-sm flex items-center"
                           >
                             Visit IEC Website <ExternalLink size={14} className="ml-1" />
                           </a>
@@ -562,52 +531,6 @@ const Dashboard = () => {
                           </div>
                         </CardContent>
                       </Card>
-                      
-                      <Card className="shadow-glass-sm overflow-hidden">
-                        <CardHeader className="bg-primary/5">
-                          <div className="flex items-center">
-                            <Avatar className="h-8 w-8 mr-3 border border-primary/20">
-                              <AvatarFallback className="bg-primary text-white">T</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <CardTitle className="text-lg">Chat with Thando</CardTitle>
-                              <CardDescription>Your MK Party assistant</CardDescription>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                          <div className="h-80 flex flex-col">
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                              {chatMessages.map((message, index) => (
-                                <div 
-                                  key={index} 
-                                  className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                                >
-                                  <div 
-                                    className={`max-w-[80%] p-3 rounded-lg ${
-                                      message.sender === "user" 
-                                        ? "bg-primary text-white" 
-                                        : "bg-mkneutral-100 text-mkneutral-800"
-                                    }`}
-                                  >
-                                    {message.text}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                            <form onSubmit={sendMessage} className="border-t p-4 flex gap-2">
-                              <input
-                                type="text"
-                                value={newMessage}
-                                onChange={(e) => setNewMessage(e.target.value)}
-                                placeholder="Type your message..."
-                                className="flex-1 form-input"
-                              />
-                              <Button type="submit">Send</Button>
-                            </form>
-                          </div>
-                        </CardContent>
-                      </Card>
                     </TabsContent>
                     
                     <TabsContent value="events" className="space-y-6">
@@ -636,7 +559,7 @@ const Dashboard = () => {
                                     <span>{formatDate(event.date)} at {event.time}</span>
                                   </div>
                                   <div className="mb-4">
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary/90">
                                       {event.location}
                                     </span>
                                   </div>
