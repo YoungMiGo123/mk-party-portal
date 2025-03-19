@@ -9,22 +9,22 @@ const Footer = () => {
     <footer className="bg-black text-white py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {/* Left Column - Logo, Contact, and Mission Statement */}
+          {/* Left Column - Logo and Mission Statement */}
           <div className="flex flex-col items-start">
             {/* Logo */}
             <div className="mb-4">
               <div className="flex items-center gap-3 mb-2">
-                <img 
-                  src="/lovable-uploads/e91116c1-e7fb-4dfb-93bb-7b8d5e7f521e.png" 
-                  alt="Tholispane" 
-                  className="h-12" 
-                />
                 <div>
                   <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
                   <div className="bg-gold px-4 py-1 font-medium text-sm">
                     UMKHONTO WESIZWE
                   </div>
                 </div>
+                <img 
+                  src="/lovable-uploads/c067fadd-f58e-451c-8b5b-be33a6754108.png" 
+                  alt="Tholispane" 
+                  className="h-16" 
+                />
               </div>
             </div>
             
