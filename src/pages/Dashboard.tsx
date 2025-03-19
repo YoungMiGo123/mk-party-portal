@@ -1,11 +1,11 @@
-
 import { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   User, MessageSquare, CalendarCheck, BarChart3, 
   LogOut, ChevronRight, ExternalLink, Check, Mail,
-  MapPin, CreditCard, CheckCircle, XCircle, Clock
+  MapPin, CreditCard, CheckCircle, XCircle, Clock,
+  Download, Share2, Edit, AlertCircle
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/store/authStore";
 import { mockEvents, mockPolls } from "@/lib/mockData";
+import VirtualMembershipCard from "@/components/membership/VirtualMembershipCard";
 
 const Dashboard = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -49,6 +50,37 @@ const Dashboard = () => {
       day: 'numeric' 
     };
     return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  // Share card
+  const shareCard = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: "MK Party Membership Card",
+        text: "Check out my MK Party membership card!",
+        url: window.location.origin + "/membership-card",
+      })
+      .then(() => {
+        toast({
+          title: "Shared Successfully",
+          description: "Your membership card has been shared.",
+        });
+      })
+      .catch((error) => {
+        console.error("Error sharing:", error);
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.origin + "/membership-card")
+        .then(() => {
+          toast({
+            title: "Link Copied",
+            description: "Your membership card link has been copied to clipboard.",
+          });
+        })
+        .catch((error) => {
+          console.error("Error copying:", error);
+        });
+    }
   };
 
   // Submit poll answer
@@ -231,40 +263,6 @@ const Dashboard = () => {
                     </CardFooter>
                   </Card>
                   
-                  {/* Membership Card Preview */}
-                  <Card className="mb-6 shadow-glass-sm overflow-hidden">
-                    <CardHeader className="bg-primary/5 pb-2">
-                      <CardTitle className="flex items-center text-lg">
-                        <CreditCard size={18} className="mr-2 text-primary" />
-                        Membership Card
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <div className="w-full aspect-video relative bg-gradient-to-br from-primary to-primary-800 rounded-lg overflow-hidden shadow-sm">
-                        <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-center">
-                          <div className="text-white font-medium text-xs">MK PARTY</div>
-                          <div className="px-1.5 py-0.5 bg-gold text-xs font-medium rounded">OFFICIAL</div>
-                        </div>
-                        <div className="absolute inset-0 flex flex-col justify-center items-center">
-                          <div className="text-white text-center">
-                            <div className="font-medium text-sm mb-1">{user.name} {user.surname}</div>
-                            <div className="text-xs text-white/80 mb-2">{user.membershipNumber}</div>
-                            {isExpired ? (
-                              <div className="text-xs bg-red-500/80 text-white py-0.5 px-2 rounded-full">EXPIRED</div>
-                            ) : (
-                              <div className="text-xs bg-white/20 text-white py-0.5 px-2 rounded-full">ACTIVE</div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-3 text-center">
-                        <Link to="/membership-card" className="text-primary hover:text-primary-700 text-sm font-medium">
-                          View Full Card
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
                   {/* Navigation Tabs (Mobile) */}
                   <div className="lg:hidden mb-6">
                     <TabsList className="w-full grid grid-cols-3">
@@ -354,6 +352,60 @@ const Dashboard = () => {
                   {/* Profile & Chat Tab */}
                   {activeTab === "profile" && (
                     <div className="space-y-6">
+                      {/* Virtual Membership Card */}
+                      <Card className="shadow-glass-sm overflow-hidden">
+                        <CardHeader className="pb-2 flex flex-row justify-between items-center">
+                          <div>
+                            <CardTitle className="flex items-center text-lg">
+                              <CreditCard size={18} className="mr-2 text-primary" />
+                              Your Membership Card
+                            </CardTitle>
+                            <CardDescription>
+                              {isExpired 
+                                ? "Your membership has expired. Please renew to continue benefits."
+                                : "Your digital membership card for MK Party"}
+                            </CardDescription>
+                          </div>
+                          <Link to="/membership-card">
+                            <Button variant="ghost" size="sm">
+                              <ExternalLink size={14} className="mr-1" />
+                              View Full Card
+                            </Button>
+                          </Link>
+                        </CardHeader>
+                        
+                        <CardContent className="p-6 flex flex-col items-center">
+                          <VirtualMembershipCard 
+                            user={user} 
+                            isExpired={isExpired} 
+                            expiryDate={membershipExpiryDate.toISOString()}
+                            previewMode={true}
+                          />
+                          
+                          <div className="flex gap-2 mt-4 w-full max-w-md">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1" 
+                              onClick={shareCard}
+                            >
+                              <Share2 size={14} className="mr-1" />
+                              Share Card
+                            </Button>
+                            <Link to="/membership-card" className="flex-1">
+                              <Button 
+                                variant="default" 
+                                size="sm" 
+                                className="w-full"
+                              >
+                                <CreditCard size={14} className="mr-1" />
+                                View Full Card
+                              </Button>
+                            </Link>
+                          </div>
+                        </CardContent>
+                      </Card>
+
                       {/* Membership Status Card */}
                       <Card className={`shadow-glass-sm border-l-4 ${isExpired ? 'border-red-500' : 'border-green-500'}`}>
                         <CardHeader className="pb-2">
@@ -423,11 +475,17 @@ const Dashboard = () => {
 
                       {/* Profile Details */}
                       <Card className="shadow-glass-sm">
-                        <CardHeader>
-                          <CardTitle>Personal Information</CardTitle>
-                          <CardDescription>
-                            Your personal details and membership information
-                          </CardDescription>
+                        <CardHeader className="flex flex-row justify-between items-start">
+                          <div>
+                            <CardTitle>Personal Information</CardTitle>
+                            <CardDescription>
+                              Your personal details and membership information
+                            </CardDescription>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            <Edit size={14} className="mr-1" />
+                            Edit
+                          </Button>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -469,9 +527,6 @@ const Dashboard = () => {
                             </div>
                           </div>
                         </CardContent>
-                        <CardFooter className="flex justify-end border-t p-4">
-                          <Button variant="outline" size="sm">Update Information</Button>
-                        </CardFooter>
                       </Card>
                       
                       {/* Voter Information */}
