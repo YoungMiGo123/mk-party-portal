@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Menu, X, User, LogOut } from "lucide-react";
@@ -32,11 +31,15 @@ const Header = () => {
   const handleDrawerOpenChange = (open: boolean) => {
     setIsMenuOpen(open);
     
-    // This fixes the scrolling issue
+    // Use a small timeout to ensure the drawer transition completes
+    // before changing overflow style (prevents jumpy behavior)
     if (open) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto";
+      // Use a small timeout to ensure the drawer transition completes before enabling scroll
+      setTimeout(() => {
+        document.body.style.overflow = "";
+      }, 300);
     }
   };
 
