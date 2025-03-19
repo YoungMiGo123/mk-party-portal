@@ -1,4 +1,3 @@
-
 import { User } from "@/store/authStore";
 
 // Mock member users for admin panel
@@ -19,12 +18,12 @@ export const mockMembers: User[] = [
     occupation: "Software Developer",
     disability: "No",
     address: "123 Main St, Johannesburg, Gauteng",
-    membershipType: "Standard",
+    membershipType: "Premium",
     membershipNumber: "MK10001",
     province: "Gauteng",
     ward: "Ward 42",
     votingStation: "Sandton Community Center",
-    joinDate: "2023-09-15",
+    joinDate: new Date().toISOString().split('T')[0],
   },
   {
     id: "2",
