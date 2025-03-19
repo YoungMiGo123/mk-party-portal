@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -212,7 +213,6 @@ const RegisterForm = () => {
   // Handle previous step
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -812,4 +812,206 @@ const RegisterForm = () => {
                     <Check className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-green-700">Standard
+                    <h3 className="font-medium text-green-700">Standard Membership</h3>
+                    <p className="text-sm text-green-600">Your selected membership type</p>
+                  </div>
+                </div>
+                <ul className="text-sm space-y-2 text-mkneutral-600 ml-16">
+                  <li className="flex items-start">
+                    <Check size={16} className="text-green-500 mt-0.5 mr-2 shrink-0" />
+                    <span>Access to MK Party membership benefits</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Check size={16} className="text-green-500 mt-0.5 mr-2 shrink-0" />
+                    <span>Digital membership card</span>
+                  </li>
+                  <li className="flex items-start">
+                    <Check size={16} className="text-green-500 mt-0.5 mr-2 shrink-0" />
+                    <span>Regular updates on party activities</span>
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 4: Membership Oath */}
+          {currentStep === 3 && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={variants}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <div className="space-y-2 mb-6">
+                <h2 className="text-2xl font-heading font-medium text-green-600">Membership Oath</h2>
+                <p className="text-mkneutral-500">Please read and accept the MK Party Membership Oath</p>
+              </div>
+
+              <div className="p-6 rounded-lg bg-cream-50 border border-mkneutral-200 space-y-4">
+                <div className="overflow-y-auto max-h-64 p-4 bg-white rounded-md text-mkneutral-800">
+                  <p className="mb-4">
+                    I voluntarily join Umkhonto weSizwe Party as an individual who is committed to abide by and uphold its
+                    constitution, values, objectives, principles, and discipline. I commit that I will never be involved in divisive
+                    and factional activities and programmes that seek to undermine the unity and discipline of the
+                    organisation. I vow to not associate with external forces that seek to destroy and undermine the unity of the
+                    organisation. I will tirelessly work to realise all its aims and objectives. I join the MKP with full knowledge
+                    and understanding that the National High Command and National Officials have the right to terminate my
+                    membership at any given point for political, ideological and organisational reasons and purposes.
+                  </p>
+                  <p>
+                    I join the MKP with full knowledge that I am not entitled to any position of responsibility in the organisation
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="acceptTerms"
+                    checked={formData.acceptTerms}
+                    onCheckedChange={(checked) => 
+                      handleCheckboxChange("acceptTerms", checked as boolean)
+                    }
+                    className={`rounded border-green-500 text-green-500 ${
+                      errors.acceptTerms ? "border-red-500" : ""
+                    }`}
+                  />
+                  <Label htmlFor="acceptTerms" className="text-sm cursor-pointer">
+                    I agree to the MK Party Membership Oath Declaration.
+                  </Label>
+                </div>
+                {errors.acceptTerms && (
+                  <p className="form-error flex items-center text-xs">
+                    <AlertCircle size={12} className="mr-1" /> {errors.acceptTerms}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 5: Payment */}
+          {currentStep === 4 && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={variants}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <div className="space-y-2 mb-6">
+                <h2 className="text-2xl font-heading font-medium text-green-600">Registration Payment</h2>
+                <p className="text-mkneutral-500">Support the party with a membership donation</p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <div className="p-6 rounded-lg bg-green-50 border border-green-100 space-y-4">
+                  <div className="flex items-center mb-2">
+                    <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center mr-4">
+                      <Check className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-green-700">Membership Fee / Donation</h3>
+                      <p className="text-sm text-green-600">Support the MK Party with your registration</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="paymentAmount" className="text-mkneutral-700 font-medium">
+                        Donation Amount (Minimum R20) <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-mkneutral-500">R</span>
+                        <Input
+                          id="paymentAmount"
+                          name="paymentAmount"
+                          type="number"
+                          min="20"
+                          value={formData.paymentAmount}
+                          onChange={handleChange}
+                          className={`form-input rounded-xl bg-white pl-8 border-mkneutral-200 shadow-sm ${errors.paymentAmount ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                          placeholder="100"
+                        />
+                      </div>
+                      {errors.paymentAmount && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.paymentAmount}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="paymentMethod" className="text-mkneutral-700 font-medium">
+                        Payment Method
+                      </Label>
+                      <RadioGroup 
+                        defaultValue="EFT" 
+                        value={formData.paymentMethod}
+                        onValueChange={(value) => handleSelectChange("paymentMethod", value)}
+                        className="flex flex-col space-y-1"
+                      >
+                        <div className="flex items-center space-x-2 rounded-lg border border-green-100 p-3 bg-white">
+                          <RadioGroupItem value="EFT" id="EFT" className="text-green-600" />
+                          <Label htmlFor="EFT" className="cursor-pointer">Electronic Transfer (EFT)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 rounded-lg border border-green-100 p-3 bg-white">
+                          <RadioGroupItem value="Card" id="Card" className="text-green-600" />
+                          <Label htmlFor="Card" className="cursor-pointer">Card Payment</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="mt-8 pt-4 border-t border-mkneutral-100 flex justify-between">
+            {currentStep > 0 ? (
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handlePrevious}
+                className="gap-2 text-mkneutral-600 rounded-xl"
+              >
+                <ChevronLeft size={16} /> Previous
+              </Button>
+            ) : (
+              <div></div>
+            )}
+            {currentStep < steps.length - 1 ? (
+              <Button 
+                type="button" 
+                onClick={handleNext}
+                className="gap-2 bg-green-600 hover:bg-green-700 rounded-xl"
+              >
+                Next <ChevronRight size={16} />
+              </Button>
+            ) : (
+              <Button 
+                type="submit"
+                className="gap-2 bg-green-600 hover:bg-green-700 rounded-xl"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    Complete Registration
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </form>
+      </Card>
+    </div>
+  );
+};
+
+export default RegisterForm;
+
