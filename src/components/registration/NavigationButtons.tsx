@@ -45,34 +45,22 @@ const NavigationButtons = ({
           Next <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       ) : (
-        <>
-          {isPaymentComplete ? (
-            <Button
-              type="button"
-              onClick={handleCompleteRegistration}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <CheckCircle className="mr-2 h-4 w-4" /> Complete Registration
-            </Button>
+        <Button
+          type="button" 
+          onClick={handleCompleteRegistration || handleNext}
+          disabled={isLoading}
+          className="bg-primary-600 hover:bg-primary-700 text-white"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
+            </>
           ) : (
-            <Button
-              type="button" 
-              onClick={handleNext}
-              disabled={isLoading}
-              className="bg-primary-600 hover:bg-primary-700 text-white"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
-                </>
-              ) : (
-                <>
-                  Process Payment <DollarSign className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
+            <>
+              Complete Registration <DollarSign className="ml-2 h-4 w-4" />
+            </>
           )}
-        </>
+        </Button>
       )}
     </div>
   );

@@ -174,9 +174,9 @@ const RegisterForm = () => {
   // Handle next step
   const handleNext = () => {
     if (validateStep()) {
-      // If we're on the payment step, process the payment
+      // If we're on the payment step, process payment and complete registration
       if (currentStep === steps.length - 1) {
-        processPayment();
+        processPaymentAndRegister();
       } else {
         // Otherwise, just move to the next step
         setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
@@ -185,20 +185,18 @@ const RegisterForm = () => {
     }
   };
 
-  // Process payment
-  const processPayment = () => {
+  // Process payment and complete registration in one step
+  const processPaymentAndRegister = () => {
     setIsLoading(true);
     
     // Simulate payment processing
     setTimeout(() => {
-      setFormData(prev => ({
-        ...prev,
-        paymentCompleted: true,
-      }));
+      // Complete the registration after payment is processed
+      setSubmissionComplete(true);
       
       toast({
-        title: "Payment Successful",
-        description: "Your payment has been processed. Please complete your registration.",
+        title: "Registration Complete",
+        description: "Your payment has been processed and registration is complete.",
       });
       
       setIsLoading(false);
@@ -220,17 +218,7 @@ const RegisterForm = () => {
     }
   };
 
-  // Handle final registration completion - separate from payment processing
-  const handleCompleteRegistration = () => {
-    setSubmissionComplete(true);
-    
-    toast({
-      title: "Registration Complete",
-      description: "Your membership registration has been completed successfully.",
-    });
-  };
-
-  // Handle login after payment completion - separate action from form submission
+  // Handle login after registration
   const handleLoginAfterPayment = () => {
     const membershipNumber = generateMembershipNumber();
     const today = new Date().toISOString().split('T')[0];
@@ -322,8 +310,7 @@ const RegisterForm = () => {
                 handlePrevious={handlePrevious}
                 handleNext={handleNext}
                 isLoading={isLoading}
-                isPaymentComplete={formData.paymentCompleted}
-                handleCompleteRegistration={handleCompleteRegistration}
+                handleCompleteRegistration={processPaymentAndRegister}
               />
             </form>
           </FormContainer>
