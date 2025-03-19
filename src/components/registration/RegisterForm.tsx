@@ -1,29 +1,31 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Check, Upload, AlertCircle, ChevronRight, ChevronLeft, Loader2, ToggleRight, CreditCard, User, Bookmark, FileCheck, DollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { User, Bookmark, FileCheck, Check, CreditCard } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/store/authStore";
-import { extractDateFromSAID, extractGenderFromSAID, generateMembershipNumber, mockOptions } from "@/lib/mockData";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
+import { extractDateFromSAID, extractGenderFromSAID, generateMembershipNumber } from "@/lib/mockData";
 
-// Steps in the registration process
-const steps = [
-  "Personal Details",
-  "Contact Details",
-  "Membership Details",
-  "Membership Oath",
-  "Registration Payment",
-];
+// Import step components
+import PersonalDetailsStep from "./steps/PersonalDetailsStep";
+import ContactDetailsStep from "./steps/ContactDetailsStep";
+import DevModeToggle from "./DevModeToggle";
+import RegistrationSuccess from "./RegistrationSuccess";
+import NavigationButtons from "./NavigationButtons";
+import ProgressSteps from "./ProgressSteps";
+import FormContainer from "./FormContainer";
+
+// Import utility functions and constants
+import {
+  devModeData,
+  initialFormData,
+  registrationSteps as steps,
+  validatePersonalDetails,
+  validateContactDetails,
+  validateMembershipDetails,
+  validateMembershipOath,
+  validatePayment,
+  motionVariants,
+} from "./registerUtils";
 
 // Step icons for visual representation
 const stepIcons = [
@@ -34,37 +36,6 @@ const stepIcons = [
   <CreditCard size={20} />
 ];
 
-// Sample data for dev mode
-const devModeData = {
-  idNumber: "9001015800083",
-  firstName: "John",
-  lastName: "Developer",
-  dateOfBirth: "1990-01-01",
-  gender: "Male",
-  race: "White",
-  language: "English",
-  nationality: "South African",
-  employmentStatus: "Employed",
-  occupation: "Software Developer",
-  disability: "No",
-  email: "dev@example.com",
-  cellphone: "0721234567",
-  address: "123 Dev Street",
-  addressLine2: "Silicon Valley",
-  postalCode: "2000",
-  province: "Gauteng",
-  municipality: "Johannesburg Metro",
-  ward: "Ward 123",
-  votingStation: "Central Library",
-  emailConfirmation: true,
-  membershipType: "Standard",
-  acceptTerms: true,
-  paymentMethod: "EFT",
-  paymentAmount: "100",
-  photoUrl: "",
-  paymentCompleted: false,
-};
-
 const RegisterForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -72,36 +43,7 @@ const RegisterForm = () => {
   
   // Form state
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
-    idNumber: "",
-    firstName: "",
-    lastName: "",
-    dateOfBirth: "",
-    gender: "",
-    race: "",
-    language: "",
-    nationality: "",
-    employmentStatus: "",
-    occupation: "",
-    disability: "No",
-    email: "",
-    cellphone: "",
-    address: "",
-    addressLine2: "",
-    postalCode: "",
-    province: "",
-    municipality: "",
-    ward: "",
-    votingStation: "",
-    emailConfirmation: true,
-    membershipType: "Standard",
-    acceptTerms: false,
-    paymentMethod: "EFT",
-    paymentAmount: "100",
-    photoUrl: "",
-    paymentCompleted: false,
-  });
-
+  const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isIDValid, setIsIDValid] = useState(false);
@@ -208,54 +150,25 @@ const RegisterForm = () => {
 
   // Validate current step
   const validateStep = () => {
-    // Skip validation if disabled
-    if (!validationEnabled) {
-      return true;
-    }
-
-    const newErrors: Record<string, string> = {};
+    let newErrors: Record<string, string> = {};
     
-    // Personal Details validation
-    if (currentStep === 0) {
-      if (!formData.idNumber) newErrors.idNumber = "ID Number is required";
-      else if (formData.idNumber.length !== 13) newErrors.idNumber = "ID Number must be 13 digits";
-      
-      if (!formData.firstName) newErrors.firstName = "First Name is required";
-      if (!formData.lastName) newErrors.lastName = "Last Name is required";
-      if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of Birth is required";
-      if (!formData.gender) newErrors.gender = "Gender is required";
-      if (!formData.race) newErrors.race = "Race is required";
-      if (!formData.language) newErrors.language = "Language is required";
-      if (!formData.nationality) newErrors.nationality = "Nationality is required";
-      if (!formData.employmentStatus) newErrors.employmentStatus = "Employment Status is required";
-    }
-    
-    // Contact Details validation
-    else if (currentStep === 1) {
-      if (!formData.email) newErrors.email = "Email is required";
-      else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
-      
-      if (!formData.cellphone) newErrors.cellphone = "Cellphone Number is required";
-      else if (!/^0\d{9}$/.test(formData.cellphone)) newErrors.cellphone = "Cellphone must be 10 digits starting with 0";
-      
-      if (!formData.address) newErrors.address = "Address is required";
-    }
-    
-    // Membership Details validation
-    else if (currentStep === 2) {
-      if (!formData.membershipType) newErrors.membershipType = "Membership Type is required";
-    }
-    
-    // Membership Oath validation
-    else if (currentStep === 3) {
-      if (!formData.acceptTerms) newErrors.acceptTerms = "You must accept the membership oath declaration";
-    }
-    
-    // Payment validation
-    else if (currentStep === 4) {
-      if (!formData.paymentAmount || parseFloat(formData.paymentAmount) < 20) {
-        newErrors.paymentAmount = "Donation amount must be at least R20";
-      }
+    // Validate based on current step
+    switch (currentStep) {
+      case 0:
+        newErrors = validatePersonalDetails(formData, validationEnabled);
+        break;
+      case 1:
+        newErrors = validateContactDetails(formData, validationEnabled);
+        break;
+      case 2:
+        newErrors = validateMembershipDetails(formData, validationEnabled);
+        break;
+      case 3:
+        newErrors = validateMembershipOath(formData, validationEnabled);
+        break;
+      case 4:
+        newErrors = validatePayment(formData, validationEnabled);
+        break;
     }
     
     setErrors(newErrors);
@@ -286,9 +199,6 @@ const RegisterForm = () => {
         
         // Simulate payment processing
         setTimeout(() => {
-          const membershipNumber = generateMembershipNumber();
-          const today = new Date().toISOString().split('T')[0];
-          
           // Mark submission as complete - this doesn't automatically log the user in
           setSubmissionComplete(true);
           
@@ -328,6 +238,8 @@ const RegisterForm = () => {
         joinDate: today,
         // Create a combined name field for backward compatibility
         name: `${formData.firstName} ${formData.lastName}`,
+        // Add the required surname field for the User type
+        surname: formData.lastName,
       },
       "dummy-token"
     );
@@ -335,519 +247,57 @@ const RegisterForm = () => {
     navigate("/membership-card");
   };
 
-  // Motion variants for animation
-  const variants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -50 }
-  };
-
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Dev Mode - Validation Toggle - Fixed to right side of screen */}
-      <div className="fixed top-24 right-4 z-50 bg-mkneutral-800/80 backdrop-blur-sm p-3 rounded-lg shadow-lg flex items-center gap-2 text-white">
-        <Label htmlFor="validation-toggle" className="text-sm font-medium cursor-pointer flex items-center">
-          <code className="bg-mkneutral-700 px-2 py-1 rounded text-xs mr-2">DEV MODE</code>
-          <span className="mr-2">Auto-fill Form</span>
-        </Label>
-        <Switch
-          id="validation-toggle"
-          checked={!devMode}
-          onCheckedChange={(checked) => toggleDevMode(!checked)}
-          className="data-[state=checked]:bg-primary-600"
-        />
-        <span className="text-xs text-mkneutral-300 ml-1">
-          {!devMode ? 'On' : 'Off'}
-        </span>
-      </div>
+      {/* Dev Mode Toggle */}
+      <DevModeToggle devMode={devMode} toggleDevMode={toggleDevMode} />
 
       {/* Payment Success Screen */}
       {submissionComplete ? (
-        <Card className="shadow-lg border-mkneutral-200 overflow-hidden rounded-xl">
-          <div className="bg-gradient-to-r from-primary-600 to-primary-700 py-6 text-center">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
-              <Check className="h-8 w-8 text-primary-600" />
-            </div>
-            <h2 className="text-2xl text-white font-medium">
-              Registration Complete
-            </h2>
-          </div>
-          <div className="p-8 text-center">
-            <p className="text-xl font-medium text-mkneutral-700 mb-3">Thank you for joining!</p>
-            <p className="text-mkneutral-500 mb-8">
-              Your membership registration has been successfully processed. You can now access your membership card and benefits.
-            </p>
-            
-            <div className="max-w-md mx-auto p-6 bg-cream-50 rounded-xl mb-8">
-              <h3 className="text-lg font-medium text-mkneutral-800 mb-4">Registration Details</h3>
-              <div className="space-y-2 text-left">
-                <div className="flex justify-between">
-                  <span className="text-mkneutral-500">Name:</span>
-                  <span className="font-medium">{formData.firstName} {formData.lastName}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-mkneutral-500">Email:</span>
-                  <span className="font-medium">{formData.email}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-mkneutral-500">Membership Type:</span>
-                  <span className="font-medium">{formData.membershipType}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-mkneutral-500">Payment Method:</span>
-                  <span className="font-medium">{formData.paymentMethod}</span>
-                </div>
-              </div>
-            </div>
-            
-            <Button 
-              onClick={handleLoginAfterPayment}
-              className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-2.5 rounded-full"
-            >
-              View My Membership Card
-            </Button>
-          </div>
-        </Card>
+        <RegistrationSuccess 
+          formData={formData}
+          handleLoginAfterPayment={handleLoginAfterPayment}
+        />
       ) : (
         <>
-          {/* Progress Steps - Improved UI */}
-          <div className="flex justify-between mb-8 md:mb-12 overflow-hidden rounded-xl shadow-md bg-white border border-mkneutral-100">
-            {steps.map((step, index) => (
-              <div 
-                key={step} 
-                className={`flex-1 flex items-center justify-center py-4 px-2 text-sm font-medium transition-all duration-300
-                  ${currentStep === index 
-                    ? "bg-primary-50 text-primary-700 border-b-2 border-primary-500" 
-                    : currentStep > index 
-                    ? "bg-cream-50 text-primary-600" 
-                    : "bg-cream-50 text-mkneutral-500"}
-                  ${index > 0 && "border-l border-mkneutral-100"}
-                `}
-              >
-                <div className="hidden sm:flex sm:items-center">
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center mr-2 
-                    ${currentStep === index ? "bg-primary-100 text-primary-600" : 
-                     currentStep > index ? "bg-primary-600 text-white" : "bg-mkneutral-100 text-mkneutral-500"}`}>
-                    {currentStep > index ? <Check size={14} /> : index + 1}
-                  </span>
-                  {step}
-                </div>
-                <div className="sm:hidden flex flex-col items-center">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center mb-1
-                    ${currentStep === index ? "bg-primary-100 text-primary-600" : 
-                     currentStep > index ? "bg-primary-600 text-white" : "bg-mkneutral-100 text-mkneutral-500"}`}>
-                    {currentStep > index ? <Check size={14} /> : stepIcons[index]}
-                  </span>
-                  <span className="text-xs">{step.split(' ')[0]}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Progress Steps */}
+          <ProgressSteps steps={steps} currentStep={currentStep} stepIcons={stepIcons} />
 
           {/* Form */}
-          <Card className="shadow-lg border-mkneutral-200 overflow-hidden rounded-xl">
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 py-5 text-center">
-              <h2 className="text-xl text-white font-medium">
-                Complete Your Registration
-              </h2>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 md:p-8">
-              <div className="text-center mb-6">
-                <p className="text-mkneutral-600">Please fill out the information below to create your membership</p>
-              </div>
-
+          <FormContainer>
+            <form onSubmit={handleSubmit}>
               {/* Step 1: Personal Details */}
               {currentStep === 0 && (
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  variants={variants}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  <div className="space-y-2">
-                    <h2 className="text-2xl font-heading font-medium text-primary-700 flex items-center">
-                      <User size={22} className="mr-2 text-primary-500" /> Personal Details
-                    </h2>
-                    <p className="text-mkneutral-500">Please enter your personal information</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="idNumber" className="text-mkneutral-700 font-medium">
-                        ID Number <span className="text-red-500">*</span>
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          id="idNumber"
-                          name="idNumber"
-                          value={formData.idNumber}
-                          onChange={handleChange}
-                          className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.idNumber ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                          placeholder="Enter your ID number"
-                          maxLength={13}
-                        />
-                        {isIDValid && (
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
-                            <Check size={16} />
-                          </span>
-                        )}
-                      </div>
-                      {errors.idNumber && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.idNumber}
-                        </p>
-                      )}
-                      {isIDValid && (
-                        <p className="text-xs text-green-500 flex items-center mt-1">
-                          <Check size={12} className="mr-1" /> ID Number validated
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName" className="text-mkneutral-700 font-medium">
-                        First Name <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.firstName ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                        placeholder="Enter your first name"
-                      />
-                      {errors.firstName && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.firstName}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName" className="text-mkneutral-700 font-medium">
-                        Last Name <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.lastName ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                        placeholder="Enter your last name"
-                      />
-                      {errors.lastName && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.lastName}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="dateOfBirth" className="text-mkneutral-700 font-medium">
-                        Date of Birth <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="dateOfBirth"
-                        name="dateOfBirth"
-                        type="date"
-                        value={formData.dateOfBirth}
-                        onChange={handleChange}
-                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.dateOfBirth ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                        disabled={isIDValid}
-                      />
-                      {errors.dateOfBirth && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.dateOfBirth}
-                        </p>
-                      )}
-                      {isIDValid && (
-                        <p className="text-xs text-mkneutral-500">Auto-populated from ID Number</p>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="gender" className="text-mkneutral-700 font-medium">
-                        Gender <span className="text-red-500">*</span>
-                      </Label>
-                      <Select
-                        name="gender"
-                        value={formData.gender}
-                        onValueChange={(value) => handleSelectChange("gender", value)}
-                        disabled={isIDValid}
-                      >
-                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.gender ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                          <SelectValue placeholder="Select your gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockOptions.genders.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.gender && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.gender}
-                        </p>
-                      )}
-                      {isIDValid && (
-                        <p className="text-xs text-mkneutral-500">Auto-populated from ID Number</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="race" className="text-mkneutral-700 font-medium">
-                        Race <span className="text-red-500">*</span>
-                      </Label>
-                      <Select
-                        name="race"
-                        value={formData.race}
-                        onValueChange={(value) => handleSelectChange("race", value)}
-                      >
-                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.race ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                          <SelectValue placeholder="Select your race" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockOptions.races.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.race && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.race}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="language" className="text-mkneutral-700 font-medium">
-                        Language <span className="text-red-500">*</span>
-                      </Label>
-                      <Select
-                        name="language"
-                        value={formData.language}
-                        onValueChange={(value) => handleSelectChange("language", value)}
-                      >
-                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.language ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                          <SelectValue placeholder="Select your language" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockOptions.languages.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.language && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.language}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="nationality" className="text-mkneutral-700 font-medium">
-                        Nationality <span className="text-red-500">*</span>
-                      </Label>
-                      <Select
-                        name="nationality"
-                        value={formData.nationality}
-                        onValueChange={(value) => handleSelectChange("nationality", value)}
-                      >
-                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.nationality ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                          <SelectValue placeholder="Select your nationality" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockOptions.nationalities.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.nationality && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.nationality}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="employmentStatus" className="text-mkneutral-700 font-medium">
-                        Employment Status <span className="text-red-500">*</span>
-                      </Label>
-                      <Select
-                        name="employmentStatus"
-                        value={formData.employmentStatus}
-                        onValueChange={(value) => handleSelectChange("employmentStatus", value)}
-                      >
-                        <SelectTrigger className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.employmentStatus ? "border-red-500 ring-1 ring-red-500" : ""}`}>
-                          <SelectValue placeholder="Select your employment status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockOptions.employmentStatuses.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.employmentStatus && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.employmentStatus}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="occupation" className="text-mkneutral-700 font-medium">Occupation</Label>
-                      <Input
-                        id="occupation"
-                        name="occupation"
-                        value={formData.occupation}
-                        onChange={handleChange}
-                        className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
-                        placeholder="Enter your occupation"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="disability" className="text-mkneutral-700 font-medium">Disability</Label>
-                      <Select
-                        name="disability"
-                        value={formData.disability}
-                        onValueChange={(value) => handleSelectChange("disability", value)}
-                      >
-                        <SelectTrigger className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm h-12">
-                          <SelectValue placeholder="Do you have a disability?" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockOptions.disabilities.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </motion.div>
+                <PersonalDetailsStep
+                  formData={formData}
+                  errors={errors}
+                  isIDValid={isIDValid}
+                  handleChange={handleChange}
+                  handleSelectChange={handleSelectChange}
+                  variants={motionVariants}
+                />
               )}
 
               {/* Step 2: Contact Details */}
               {currentStep === 1 && (
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  variants={variants}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  <div className="space-y-2 mb-6">
-                    <h2 className="text-2xl font-heading font-medium text-primary-700 flex items-center">
-                      <Bookmark size={22} className="mr-2 text-primary-500" /> Contact Details
-                    </h2>
-                    <p className="text-mkneutral-500">We'll use these details to keep you updated</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="cellphone" className="text-mkneutral-700 font-medium">
-                        Cellphone Number <span className="text-red-500">*</span>
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          id="cellphone"
-                          name="cellphone"
-                          value={formData.cellphone}
-                          onChange={handleChange}
-                          className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.cellphone ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                          placeholder="(073) 123 4567"
-                          maxLength={10}
-                        />
-                      </div>
-                      {errors.cellphone && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.cellphone}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-mkneutral-700 font-medium">
-                        Email Address <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.email ? "border-red-500 ring-1 ring-red-500" : ""}`}
-                        placeholder="name@example.com"
-                      />
-                      {errors.email && (
-                        <p className="form-error flex items-center text-xs">
-                          <AlertCircle size={12} className="mr-1" /> {errors.email}
-                        </p>
-                      )}
-                    </div>
-                    
-                    {/* Additional fields would go here */}
-                  </div>
-                </motion.div>
+                <ContactDetailsStep
+                  formData={formData}
+                  errors={errors}
+                  handleChange={handleChange}
+                  variants={motionVariants}
+                />
               )}
               
               {/* Navigation Buttons */}
-              <div className="mt-8 flex justify-between">
-                {currentStep > 0 ? (
-                  <Button
-                    type="button"
-                    onClick={handlePrevious}
-                    className="bg-mkneutral-100 text-mkneutral-700 hover:bg-mkneutral-200"
-                  >
-                    <ChevronLeft className="mr-2 h-4 w-4" /> Previous
-                  </Button>
-                ) : (
-                  <div></div> // Empty div to maintain layout
-                )}
-                
-                {currentStep < steps.length - 1 ? (
-                  <Button
-                    type="button"
-                    onClick={handleNext}
-                    className="bg-primary-600 hover:bg-primary-700 text-white"
-                  >
-                    Next <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="bg-primary-600 hover:bg-primary-700 text-white"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
-                      </>
-                    ) : (
-                      <>
-                        Complete Registration <DollarSign className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
+              <NavigationButtons
+                currentStep={currentStep}
+                totalSteps={steps.length}
+                handlePrevious={handlePrevious}
+                handleNext={handleNext}
+                isLoading={isLoading}
+              />
             </form>
-          </Card>
+          </FormContainer>
         </>
       )}
     </div>
