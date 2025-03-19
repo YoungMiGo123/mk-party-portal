@@ -11,18 +11,18 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Left Column - Logo and Contact */}
           <div className="flex flex-col items-center md:items-start">
-            <div className="mb-4">
+            <div className="mb-4 text-center md:text-left">
               <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
               <div className="bg-yellow-500 text-black px-4 py-1 font-medium text-sm">
                 UMKHONTO WESIZWE
               </div>
             </div>
-            <div className="text-sm text-gray-300">
+            <div className="text-sm text-gray-300 mt-2">
               info@mkparty.co.za | mkparty.org.za
             </div>
           </div>
 
-          {/* Right Column - Slogan */}
+          {/* Right Column - Slogan and Social */}
           <div className="flex flex-col items-center md:items-end">
             <div className="border border-white p-4 mb-6 text-center md:text-right max-w-sm">
               <p className="text-sm">
