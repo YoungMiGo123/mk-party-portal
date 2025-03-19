@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -154,7 +155,7 @@ const RegisterForm = () => {
       
       if (!formData.name) newErrors.name = "Name is required";
       if (!formData.surname) newErrors.surname = "Surname is required";
-      if (!formData.dateOfBirth) newErrors.dateOf Birth = "Date of Birth is required";
+      if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of Birth is required";
       if (!formData.gender) newErrors.gender = "Gender is required";
       if (!formData.race) newErrors.race = "Race is required";
       if (!formData.language) newErrors.language = "Language is required";
@@ -205,7 +206,6 @@ const RegisterForm = () => {
   // Handle previous step
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -904,4 +904,100 @@ const RegisterForm = () => {
               exit="exit"
               variants={variants}
               transition={{ duration: 0.3 }}
-              className
+              className="space-y-6"
+            >
+              <div className="space-y-4">
+                <h2 className="text-2xl font-heading font-medium">Registration Payment</h2>
+                <p className="text-mkneutral-500">Please select your payment method and amount</p>
+
+                <div className="space-y-4">
+                  <Label>Payment Method</Label>
+                  <RadioGroup
+                    value={formData.paymentMethod}
+                    onValueChange={(value) => handleSelectChange("paymentMethod", value)}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                  >
+                    <div className="flex items-center space-x-2 border border-mkneutral-200 rounded-lg p-4">
+                      <RadioGroupItem value="EFT" id="EFT" />
+                      <Label htmlFor="EFT" className="font-medium cursor-pointer">EFT (Bank Transfer)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2 border border-mkneutral-200 rounded-lg p-4">
+                      <RadioGroupItem value="Card" id="Card" />
+                      <Label htmlFor="Card" className="font-medium cursor-pointer">Credit/Debit Card</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-4">
+                  <Label htmlFor="paymentAmount">
+                    Donation Amount (min R20) <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-mkneutral-600">R</span>
+                    <Input
+                      id="paymentAmount"
+                      name="paymentAmount"
+                      type="number"
+                      min="20"
+                      value={formData.paymentAmount}
+                      onChange={handleChange}
+                      className={`form-input pl-8 ${errors.paymentAmount ? "border-red-500" : ""}`}
+                    />
+                  </div>
+                  {errors.paymentAmount && (
+                    <p className="form-error flex items-center text-xs">
+                      <AlertCircle size={12} className="mr-1" /> {errors.paymentAmount}
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-6">
+                  <Button 
+                    type="submit"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      "Complete Registration & Make Payment"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Navigation Buttons */}
+          {currentStep < steps.length - 1 && (
+            <div className="flex justify-between mt-8 pt-6 border-t border-mkneutral-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 0}
+                className="rounded-full"
+              >
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Previous
+              </Button>
+              <Button
+                type="button"
+                onClick={handleNext}
+                className="bg-green-600 hover:bg-green-700 text-white rounded-full"
+              >
+                Next
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </form>
+      </Card>
+    </div>
+  );
+};
+
+export default RegisterForm;

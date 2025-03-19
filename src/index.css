@@ -190,7 +190,7 @@
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-glass-hover hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-glass hover:-translate-y-1;
   }
   
   .page-transition {
@@ -259,7 +259,7 @@
 
 .step-item.active:not(:first-child):before,
 .step-item.complete:not(:first-child):before {
-  @apply bg-mkgreen-500;
+  @apply bg-green-500;
 }
 
 .step {
@@ -267,11 +267,11 @@
 }
 
 .step.active {
-  @apply bg-mkgreen-500 text-white;
+  @apply bg-green-500 text-white;
 }
 
 .step.complete {
-  @apply bg-mkgreen-600 text-white;
+  @apply bg-green-600 text-white;
 }
 
 .step-text {
@@ -279,9 +279,9 @@
 }
 
 .step-text.active {
-  @apply text-mkgreen-600;
+  @apply text-green-600;
 }
 
 .step-text.complete {
-  @apply text-mkgreen-700;
+  @apply text-green-700;
 }

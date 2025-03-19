@@ -112,6 +112,9 @@ export default {
       },
       boxShadow: {
         glass: "0 4px 30px rgba(0, 0, 0, 0.1)",
+        "glass-hover": "0 8px 40px rgba(0, 0, 0, 0.15)",
+        button: "0 2px 4px rgba(0, 0, 0, 0.05)",
+        "button-hover": "0 4px 8px rgba(0, 0, 0, 0.1)",
       },
     },
   },
