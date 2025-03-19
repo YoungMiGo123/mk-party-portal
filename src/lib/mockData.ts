@@ -1,3 +1,4 @@
+
 import { User } from "@/store/authStore";
 
 // Mock member users for admin panel
@@ -211,7 +212,11 @@ export const mockOptions = {
     "Other",
   ],
   disabilities: ["No", "Yes"],
-  membershipTypes: ["Standard", "Premium", "Volunteer"],
+  membershipTypes: [
+    { value: "Standard", label: "Standard Membership" },
+    { value: "Premium", label: "Premium Membership" },
+    { value: "Volunteer", label: "Volunteer Member" }
+  ],
   provinces: [
     "Eastern Cape",
     "Free State",
@@ -223,6 +228,22 @@ export const mockOptions = {
     "Northern Cape",
     "Western Cape",
   ],
+  municipalities: [
+    "Johannesburg Metro",
+    "Cape Town Metro",
+    "eThekwini Metro",
+    "Tshwane Metro",
+    "Ekurhuleni Metro",
+    "Buffalo City",
+    "Mangaung",
+    "Nelson Mandela Bay",
+    "Other Local Municipality"
+  ],
+  paymentMethods: [
+    { value: "EFT", label: "Bank Transfer/EFT" },
+    { value: "CreditCard", label: "Credit/Debit Card" },
+    { value: "Cash", label: "Cash Deposit" }
+  ]
 };
 
 // Helper function to extract date of birth from South African ID number
