@@ -8,7 +8,8 @@ import {
   Drawer,
   DrawerContent,
   DrawerClose,
-  DrawerTrigger
+  DrawerTrigger,
+  DrawerTitle
 } from "@/components/ui/drawer";
 
 const Header = () => {
@@ -27,17 +28,17 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (isMenuOpen) {
+  // Handle drawer open/close effects
+  const handleDrawerOpenChange = (open: boolean) => {
+    setIsMenuOpen(open);
+    
+    // This fixes the scrolling issue
+    if (open) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-    
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isMenuOpen]);
+  };
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -123,7 +124,7 @@ const Header = () => {
 
         {/* Mobile Navigation Drawer */}
         <div className="md:hidden">
-          <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+          <Drawer open={isMenuOpen} onOpenChange={handleDrawerOpenChange}>
             <DrawerTrigger asChild>
               <Button
                 className="p-2 rounded-md focus:outline-none"
@@ -134,6 +135,9 @@ const Header = () => {
               </Button>
             </DrawerTrigger>
             <DrawerContent className="h-[85vh] pt-5">
+              {/* Add a hidden DrawerTitle for accessibility */}
+              <DrawerTitle className="sr-only">Navigation Menu</DrawerTitle>
+              
               <div className="flex justify-between items-center px-4 mb-4">
                 <h2 className="text-lg font-medium">Menu</h2>
                 <DrawerClose asChild>
