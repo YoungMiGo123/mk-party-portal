@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -13,14 +12,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/store/authStore";
 import { extractDateFromSAID, extractGenderFromSAID, generateMembershipNumber, mockOptions } from "@/lib/mockData";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Steps in the registration process
 const steps = [
   "Personal Details",
   "Contact Details",
-  "Membership",
-  "Confirmation",
-  "Payment",
+  "Membership Details",
+  "Membership Oath",
+  "Registration Payment",
 ];
 
 const RegisterForm = () => {
@@ -45,10 +45,17 @@ const RegisterForm = () => {
     email: "",
     cellphone: "",
     address: "",
+    addressLine2: "",
+    postalCode: "",
+    province: "",
+    municipality: "",
+    ward: "",
+    votingStation: "",
     emailConfirmation: true,
     membershipType: "Standard",
     acceptTerms: false,
     paymentMethod: "EFT",
+    paymentAmount: "100",
     photoUrl: "",
   });
 
@@ -147,7 +154,7 @@ const RegisterForm = () => {
       
       if (!formData.name) newErrors.name = "Name is required";
       if (!formData.surname) newErrors.surname = "Surname is required";
-      if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of Birth is required";
+      if (!formData.dateOfBirth) newErrors.dateOf Birth = "Date of Birth is required";
       if (!formData.gender) newErrors.gender = "Gender is required";
       if (!formData.race) newErrors.race = "Race is required";
       if (!formData.language) newErrors.language = "Language is required";
@@ -169,12 +176,18 @@ const RegisterForm = () => {
     // Membership Details validation
     else if (currentStep === 2) {
       if (!formData.membershipType) newErrors.membershipType = "Membership Type is required";
-      if (!formData.acceptTerms) newErrors.acceptTerms = "You must accept the terms and conditions";
+    }
+    
+    // Membership Oath validation
+    else if (currentStep === 3) {
+      if (!formData.acceptTerms) newErrors.acceptTerms = "You must accept the membership oath declaration";
     }
     
     // Payment validation
-    else if (currentStep === 3) {
-      if (!formData.paymentMethod) newErrors.paymentMethod = "Payment Method is required";
+    else if (currentStep === 4) {
+      if (!formData.paymentAmount || parseFloat(formData.paymentAmount) < 20) {
+        newErrors.paymentAmount = "Donation amount must be at least R20";
+      }
     }
     
     setErrors(newErrors);
@@ -192,6 +205,7 @@ const RegisterForm = () => {
   // Handle previous step
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -214,9 +228,6 @@ const RegisterForm = () => {
               id: Math.random().toString(36).substring(7),
               ...formData,
               membershipNumber,
-              province: "Gauteng", // Placeholder
-              ward: "Ward 42", // Placeholder
-              votingStation: "Local Community Hall", // Placeholder
               joinDate: today,
             },
             "dummy-token"
@@ -254,38 +265,15 @@ const RegisterForm = () => {
         {steps.map((step, index) => (
           <div 
             key={step} 
-            className={`step-item ${
+            className={`step-item flex-1 text-center ${
               currentStep === index 
-                ? "active" 
+                ? "active bg-green-50" 
                 : currentStep > index 
-                ? "complete" 
-                : ""
-            }`}
+                ? "complete bg-cream-50" 
+                : "bg-cream-50"
+            } ${index === currentStep ? 'border-b-4 border-green-500' : ''}`}
           >
-            <div 
-              className={`step ${
-                currentStep === index 
-                  ? "active" 
-                  : currentStep > index 
-                  ? "complete" 
-                  : ""
-              }`}
-            >
-              {currentStep > index ? (
-                <Check className="w-6 h-6" />
-              ) : (
-                index + 1
-              )}
-            </div>
-            <div 
-              className={`step-text ${
-                currentStep === index 
-                  ? "active" 
-                  : currentStep > index 
-                  ? "complete" 
-                  : ""
-              }`}
-            >
+            <div className="py-3 px-1 text-sm font-medium">
               {step}
             </div>
           </div>
@@ -293,9 +281,15 @@ const RegisterForm = () => {
       </div>
 
       {/* Form */}
-      <Card className="shadow-glass border-mkneutral-200 overflow-hidden">
+      <Card className="shadow-glass border-mkneutral-200 overflow-hidden rounded-lg">
         <form onSubmit={handleSubmit} className="p-6 md:p-8">
-          {/* Step 1: Personal Details */}
+          <div className="text-center mb-6">
+            <h2 className="text-xl text-green-600 font-medium">
+              Final Stage. Please fill in the form below to help us serve you better.
+            </h2>
+          </div>
+
+          {/* Step 1: Personal Details - keeping existing code */}
           {currentStep === 0 && (
             <motion.div
               initial="hidden"
@@ -588,12 +582,27 @@ const RegisterForm = () => {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              <div className="space-y-2">
-                <h2 className="text-2xl font-heading font-medium">Contact Details</h2>
-                <p className="text-mkneutral-500">How can we reach you?</p>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="cellphone">
+                    Cellphone Number <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="cellphone"
+                    name="cellphone"
+                    value={formData.cellphone}
+                    onChange={handleChange}
+                    className={`form-input rounded-full ${errors.cellphone ? "border-red-500" : ""}`}
+                    placeholder="(Cellphone Number) 073 123 4567"
+                    maxLength={10}
+                  />
+                  {errors.cellphone && (
+                    <p className="form-error flex items-center text-xs">
+                      <AlertCircle size={12} className="mr-1" /> {errors.cellphone}
+                    </p>
+                  )}
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="email">
                     Email Address <span className="text-red-500">*</span>
@@ -604,8 +613,8 @@ const RegisterForm = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`form-input ${errors.email ? "border-red-500" : ""}`}
-                    placeholder="your.email@example.com"
+                    className={`form-input rounded-full bg-cream-50 ${errors.email ? "border-red-500" : ""}`}
+                    placeholder="Email Address"
                   />
                   {errors.email && (
                     <p className="form-error flex items-center text-xs">
@@ -614,37 +623,17 @@ const RegisterForm = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cellphone">
-                    Cellphone Number <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="cellphone"
-                    name="cellphone"
-                    value={formData.cellphone}
-                    onChange={handleChange}
-                    className={`form-input ${errors.cellphone ? "border-red-500" : ""}`}
-                    placeholder="0XXXXXXXXX"
-                    maxLength={10}
-                  />
-                  {errors.cellphone && (
-                    <p className="form-error flex items-center text-xs">
-                      <AlertCircle size={12} className="mr-1" /> {errors.cellphone}
-                    </p>
-                  )}
-                </div>
-
                 <div className="md:col-span-2 space-y-2">
                   <Label htmlFor="address">
-                    Physical Address <span className="text-red-500">*</span>
+                    Residential Address - Line 1 <span className="text-red-500">*</span>
                   </Label>
-                  <Textarea
+                  <Input
                     id="address"
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    className={`form-input min-h-[100px] ${errors.address ? "border-red-500" : ""}`}
-                    placeholder="Enter your full address"
+                    className={`form-input rounded-full bg-green-50 ${errors.address ? "border-red-500" : ""}`}
+                    placeholder="Residential Address - Line 1"
                   />
                   {errors.address && (
                     <p className="form-error flex items-center text-xs">
@@ -652,29 +641,64 @@ const RegisterForm = () => {
                     </p>
                   )}
                 </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="addressLine2">
+                    Residential Address - Line 2
+                  </Label>
+                  <Input
+                    id="addressLine2"
+                    name="addressLine2"
+                    value={formData.addressLine2}
+                    onChange={handleChange}
+                    className="form-input rounded-full bg-green-50"
+                    placeholder="Residential Address - Line 2"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="postalCode">
+                    Postal Code
+                  </Label>
+                  <Input
+                    id="postalCode"
+                    name="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleChange}
+                    className="form-input rounded-full bg-green-50"
+                    placeholder="Postal Code"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="province">
+                    Province
+                  </Label>
+                  <Input
+                    id="province"
+                    name="province"
+                    value={formData.province}
+                    onChange={handleChange}
+                    className="form-input rounded-full bg-green-50"
+                    placeholder="Province"
+                  />
+                </div>
               </div>
 
               <div className="pt-4 border-t border-mkneutral-100">
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="emailConfirmation"
                     checked={formData.emailConfirmation}
-                    onChange={(e) => handleCheckboxChange("emailConfirmation", e.target.checked)}
+                    onCheckedChange={(checked) => 
+                      handleCheckboxChange("emailConfirmation", checked as boolean)
+                    }
                     className="rounded border-mkneutral-300 text-primary focus:ring-primary"
                   />
                   <Label htmlFor="emailConfirmation" className="text-sm cursor-pointer">
                     I would like to receive email updates from MK Party
                   </Label>
                 </div>
-              </div>
-
-              {/* IEC Information (placeholder) */}
-              <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
-                <h3 className="text-sm font-medium text-blue-800 mb-2">Voter Registration Details</h3>
-                <p className="text-xs text-blue-700">
-                  When we connect to the IEC API, we'll automatically retrieve your ward, voting district, and voting station information.
-                </p>
               </div>
             </motion.div>
           )}
@@ -689,13 +713,51 @@ const RegisterForm = () => {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              <div className="space-y-2">
-                <h2 className="text-2xl font-heading font-medium">Membership Details</h2>
-                <p className="text-mkneutral-500">Choose your membership type and upload a photo</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="municipality">
+                    Municipality
+                  </Label>
+                  <Input
+                    id="municipality"
+                    name="municipality"
+                    value={formData.municipality}
+                    onChange={handleChange}
+                    className="form-input rounded-full"
+                    placeholder="(Municipality) Johannesburg Metro - Midrand"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ward">
+                    Ward
+                  </Label>
+                  <Input
+                    id="ward"
+                    name="ward"
+                    value={formData.ward}
+                    onChange={handleChange}
+                    className="form-input rounded-full"
+                    placeholder="WARD 77 - Waterfall"
+                  />
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="votingStation">
+                    Voting Station
+                  </Label>
+                  <Input
+                    id="votingStation"
+                    name="votingStation"
+                    value={formData.votingStation}
+                    onChange={handleChange}
+                    className="form-input rounded-full bg-green-50"
+                    placeholder="Voting Station Name"
+                  />
+                </div>
               </div>
 
-              {/* Membership Type */}
-              <div className="space-y-4">
+              <div className="space-y-4 hidden">
                 <Label>
                   Membership Type <span className="text-red-500">*</span>
                 </Label>
@@ -719,46 +781,6 @@ const RegisterForm = () => {
                       <li className="list-disc">Monthly newsletter</li>
                     </ul>
                   </div>
-                  
-                  <div className={`
-                    rounded-lg border border-mkneutral-200 p-4 cursor-pointer transition-all
-                    ${formData.membershipType === 'Premium' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}
-                  `}
-                  onClick={() => handleSelectChange("membershipType", "Premium")}>
-                    <div className="flex items-center mb-2">
-                      <div className="w-4 h-4 rounded-full border border-mkneutral-300 flex items-center justify-center mr-2">
-                        {formData.membershipType === 'Premium' && (
-                          <div className="w-2 h-2 rounded-full bg-primary" />
-                        )}
-                      </div>
-                      <h4 className="font-medium">Premium Member</h4>
-                    </div>
-                    <ul className="text-sm space-y-1 text-mkneutral-600 ml-6">
-                      <li className="list-disc">All Standard benefits</li>
-                      <li className="list-disc">Invitation to special events</li>
-                      <li className="list-disc">Priority voting on party polls</li>
-                    </ul>
-                  </div>
-                  
-                  <div className={`
-                    rounded-lg border border-mkneutral-200 p-4 cursor-pointer transition-all
-                    ${formData.membershipType === 'Volunteer' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}
-                  `}
-                  onClick={() => handleSelectChange("membershipType", "Volunteer")}>
-                    <div className="flex items-center mb-2">
-                      <div className="w-4 h-4 rounded-full border border-mkneutral-300 flex items-center justify-center mr-2">
-                        {formData.membershipType === 'Volunteer' && (
-                          <div className="w-2 h-2 rounded-full bg-primary" />
-                        )}
-                      </div>
-                      <h4 className="font-medium">Volunteer Member</h4>
-                    </div>
-                    <ul className="text-sm space-y-1 text-mkneutral-600 ml-6">
-                      <li className="list-disc">All Standard benefits</li>
-                      <li className="list-disc">Active participation in campaigns</li>
-                      <li className="list-disc">Leadership opportunities</li>
-                    </ul>
-                  </div>
                 </div>
                 {errors.membershipType && (
                   <p className="form-error flex items-center text-xs">
@@ -767,8 +789,8 @@ const RegisterForm = () => {
                 )}
               </div>
 
-              {/* Photo Upload */}
-              <div className="space-y-4">
+              {/* Photo Upload - keeping existing code but hidden for now */}
+              <div className="space-y-4 hidden">
                 <Label htmlFor="photoUpload">Profile Photo (Optional)</Label>
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <div className="w-32 h-32 rounded-lg border-2 border-dashed border-mkneutral-300 flex items-center justify-center bg-mkneutral-50 overflow-hidden">
@@ -822,27 +844,47 @@ const RegisterForm = () => {
                   </div>
                 </div>
               </div>
+            </motion.div>
+          )}
 
-              {/* Membership Oath */}
-              <div className="p-6 rounded-lg bg-mkneutral-50 border border-mkneutral-200 space-y-4">
-                <h3 className="font-medium text-lg">Membership Oath</h3>
-                <p className="text-mkneutral-700">
-                  As a member of the MK Party, I pledge to uphold the values and principles of the party. 
-                  I commit to working towards a united, prosperous and democratic South Africa where all citizens 
-                  have equal opportunities and rights. I will conduct myself with integrity and respect at all times.
-                </p>
+          {/* Step 4: Membership Oath */}
+          {currentStep === 3 && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={variants}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <div className="p-6 rounded-lg bg-cream-50 border border-mkneutral-200 space-y-4">
+                <div className="overflow-y-auto max-h-64 p-4 bg-cream-50 rounded-md text-mkneutral-800">
+                  <p className="mb-4">
+                    I voluntarily join Umkhonto weSizwe Party as an individual who is committed to abide by and uphold its
+                    constitution, values, objectives, principles, and discipline. I commit that I will never be involved in divisive
+                    and factional activities and programmes that seek to undermine the unity and discipline of the
+                    organisation. I vow to not associate with external forces that seek to destroy and undermine the unity of the
+                    organisation. I will tirelessly work to realise all its aims and objectives. I join the MKP with full knowledge
+                    and understanding that the National High Command and National Officials have the right to terminate my
+                    membership at any given point for political, ideological and organisational reasons and purposes.
+                  </p>
+                  <p>
+                    I join the MKP with full knowledge that I am not entitled to any position of responsibility in the organisation
+                  </p>
+                </div>
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="acceptTerms"
                     checked={formData.acceptTerms}
-                    onChange={(e) => handleCheckboxChange("acceptTerms", e.target.checked)}
-                    className={`rounded border-mkneutral-300 text-primary focus:ring-primary ${
+                    onCheckedChange={(checked) => 
+                      handleCheckboxChange("acceptTerms", checked as boolean)
+                    }
+                    className={`rounded border-green-500 text-green-500 ${
                       errors.acceptTerms ? "border-red-500" : ""
                     }`}
                   />
                   <Label htmlFor="acceptTerms" className="text-sm cursor-pointer">
-                    I agree to the <a href="/terms" className="text-primary hover:underline">terms and conditions</a> and acknowledge the <a href="/privacy" className="text-primary hover:underline">privacy policy</a>
+                    I agree to the MK Party Membership Oath Declaration.
                   </Label>
                 </div>
                 {errors.acceptTerms && (
@@ -854,104 +896,7 @@ const RegisterForm = () => {
             </motion.div>
           )}
 
-          {/* Step 4: Payment */}
-          {currentStep === 3 && (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="space-y-2">
-                <h2 className="text-2xl font-heading font-medium">Payment Options</h2>
-                <p className="text-mkneutral-500">Choose your preferred payment method</p>
-              </div>
-
-              <div className="bg-mkneutral-50 border border-mkneutral-200 rounded-lg p-6">
-                <div className="mb-4">
-                  <h3 className="font-medium mb-2">Membership Fee</h3>
-                  <p className="text-2xl font-medium text-primary">R100.00</p>
-                  <p className="text-sm text-mkneutral-500">Annual membership fee</p>
-                </div>
-                
-                <div className="space-y-4 pt-4 border-t border-mkneutral-200">
-                  <div className="space-y-2">
-                    <Label>Select Payment Method</Label>
-                    <RadioGroup 
-                      value={formData.paymentMethod}
-                      onValueChange={(value) => handleSelectChange("paymentMethod", value)}
-                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                    >
-                      <div className={`
-                        flex items-center space-x-2 p-4 rounded-lg border border-mkneutral-200
-                        ${formData.paymentMethod === 'EFT' ? 'border-primary bg-primary/5' : ''}
-                      `}>
-                        <RadioGroupItem value="EFT" id="eft" />
-                        <Label htmlFor="eft" className="flex-1 cursor-pointer">
-                          <div className="font-medium">Electronic Funds Transfer (EFT)</div>
-                          <div className="text-sm text-mkneutral-500">Manual bank transfer</div>
-                        </Label>
-                      </div>
-                      
-                      <div className={`
-                        flex items-center space-x-2 p-4 rounded-lg border border-mkneutral-200
-                        ${formData.paymentMethod === 'Online' ? 'border-primary bg-primary/5' : ''}
-                      `}>
-                        <RadioGroupItem value="Online" id="online" />
-                        <Label htmlFor="online" className="flex-1 cursor-pointer">
-                          <div className="font-medium">Online Payment</div>
-                          <div className="text-sm text-mkneutral-500">Credit card or instant EFT</div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                    {errors.paymentMethod && (
-                      <p className="form-error flex items-center text-xs">
-                        <AlertCircle size={12} className="mr-1" /> {errors.paymentMethod}
-                      </p>
-                    )}
-                  </div>
-
-                  {formData.paymentMethod === 'EFT' && (
-                    <div className="p-4 rounded-lg bg-blue-50 border border-blue-100 mt-4">
-                      <h4 className="font-medium text-blue-800 mb-2">Bank Details</h4>
-                      <div className="space-y-2 text-sm text-blue-700">
-                        <p><span className="font-medium">Bank:</span> South African Bank</p>
-                        <p><span className="font-medium">Account Name:</span> MK Party</p>
-                        <p><span className="font-medium">Account Number:</span> 1234567890</p>
-                        <p><span className="font-medium">Branch Code:</span> 123456</p>
-                        <p><span className="font-medium">Reference:</span> Your ID Number</p>
-                      </div>
-                      <p className="text-xs text-blue-700 mt-4">
-                        Please use your ID Number as the reference when making the payment.
-                        Send proof of payment to <a href="mailto:payments@mkparty.org" className="underline">payments@mkparty.org</a>
-                      </p>
-                    </div>
-                  )}
-
-                  {formData.paymentMethod === 'Online' && (
-                    <div className="mt-4">
-                      <p className="text-sm text-mkneutral-500 mb-4">
-                        You will be redirected to our secure payment gateway after completing this form.
-                      </p>
-                      <div className="flex items-center space-x-2 p-4 rounded-lg bg-mkneutral-50 border border-mkneutral-200">
-                        <div className="text-mkneutral-400">
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M16 21V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </div>
-                        <span className="text-sm">Your payment will be processed securely.</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 5: Confirmation */}
+          {/* Step 5: Payment */}
           {currentStep === 4 && (
             <motion.div
               initial="hidden"
@@ -959,103 +904,4 @@ const RegisterForm = () => {
               exit="exit"
               variants={variants}
               transition={{ duration: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="text-center space-y-2 py-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check size={32} className="text-green-600" />
-                </div>
-                <h2 className="text-2xl font-heading font-medium">Registration Complete!</h2>
-                <p className="text-mkneutral-500">Thank you for registering with MK Party</p>
-              </div>
-
-              <div className="bg-mkneutral-50 border border-mkneutral-200 rounded-lg p-6 space-y-4">
-                <h3 className="font-medium">Registration Summary</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-mkneutral-500">Personal Details</h4>
-                    <ul className="mt-2 space-y-1">
-                      <li><span className="font-medium">Name:</span> {formData.name} {formData.surname}</li>
-                      <li><span className="font-medium">ID Number:</span> {formData.idNumber}</li>
-                      <li><span className="font-medium">Date of Birth:</span> {new Date(formData.dateOfBirth).toLocaleDateString()}</li>
-                      <li><span className="font-medium">Gender:</span> {formData.gender}</li>
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-sm font-medium text-mkneutral-500">Contact Details</h4>
-                    <ul className="mt-2 space-y-1">
-                      <li><span className="font-medium">Email:</span> {formData.email}</li>
-                      <li><span className="font-medium">Cellphone:</span> {formData.cellphone}</li>
-                      <li><span className="font-medium">Address:</span> {formData.address}</li>
-                    </ul>
-                  </div>
-                </div>
-                
-                <div className="pt-4 border-t border-mkneutral-200">
-                  <h4 className="text-sm font-medium text-mkneutral-500">Membership Details</h4>
-                  <ul className="mt-2 space-y-1">
-                    <li><span className="font-medium">Membership Type:</span> {formData.membershipType}</li>
-                    <li><span className="font-medium">Payment Method:</span> {formData.paymentMethod}</li>
-                    <li><span className="font-medium">Membership Fee:</span> R100.00</li>
-                    <li><span className="font-medium">Status:</span> <span className="text-green-600">Paid</span></li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="text-center space-y-4">
-                <p>Your virtual membership card is now available!</p>
-                <Button 
-                  type="button"
-                  className="mx-auto w-full max-w-md" 
-                  onClick={() => navigate('/membership-card')}
-                >
-                  View Membership Card
-                </Button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
-            {currentStep > 0 && currentStep < steps.length - 1 && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handlePrevious}
-                className="flex items-center"
-              >
-                <ChevronLeft size={16} className="mr-1" />
-                Previous
-              </Button>
-            )}
-            
-            {currentStep === 0 && (
-              <div></div> // Empty div for flexbox spacing
-            )}
-            
-            {currentStep < steps.length - 1 && (
-              <Button
-                type="submit"
-                className="flex items-center ml-auto"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                ) : (
-                  <>
-                    {currentStep === steps.length - 2 ? "Complete Registration" : "Next"}
-                    <ChevronRight size={16} className="ml-1" />
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </form>
-      </Card>
-    </div>
-  );
-};
-
-export default RegisterForm;
+              className

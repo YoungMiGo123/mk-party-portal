@@ -6,27 +6,25 @@ import RegisterForm from "@/components/registration/RegisterForm";
 
 const Register = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-mkneutral-50">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header />
       
-      <main className="flex-grow pt-24 pb-16">
-        <div className="container mx-auto px-4 py-8">
+      <main className="flex-grow pt-0 pb-16">
+        <div className="bg-green-600 py-12 mb-8">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-5xl font-heading font-bold tracking-tight text-white mb-2">
+              Become a member of the <span className="text-yellow-400">MK Party</span>
+            </h1>
+          </div>
+        </div>
+        
+        <div className="container mx-auto px-4 py-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight text-mkneutral-900 mb-4">
-                Join MK Party
-              </h1>
-              <p className="text-mkneutral-600 max-w-2xl mx-auto">
-                Complete the registration form below to become a member of the MK Party.
-                Your information is protected and secure.
-              </p>
-            </div>
-            
             <RegisterForm />
           </motion.div>
         </div>
