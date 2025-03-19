@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -793,4 +794,64 @@ const RegisterForm = () => {
                         className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.email ? "border-red-500 ring-1 ring-red-500" : ""}`}
                         placeholder="name@example.com"
                       />
-                      {errors.email
+                      {errors.email && (
+                        <p className="form-error flex items-center text-xs">
+                          <AlertCircle size={12} className="mr-1" /> {errors.email}
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Additional fields would go here */}
+                  </div>
+                </motion.div>
+              )}
+              
+              {/* Navigation Buttons */}
+              <div className="mt-8 flex justify-between">
+                {currentStep > 0 ? (
+                  <Button
+                    type="button"
+                    onClick={handlePrevious}
+                    className="bg-mkneutral-100 text-mkneutral-700 hover:bg-mkneutral-200"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+                  </Button>
+                ) : (
+                  <div></div> // Empty div to maintain layout
+                )}
+                
+                {currentStep < steps.length - 1 ? (
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="bg-primary-600 hover:bg-primary-700 text-white"
+                  >
+                    Next <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-primary-600 hover:bg-primary-700 text-white"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
+                      </>
+                    ) : (
+                      <>
+                        Complete Registration <DollarSign className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </form>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default RegisterForm;
