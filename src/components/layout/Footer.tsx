@@ -13,9 +13,18 @@ const Footer = () => {
           <div className="flex flex-col items-start">
             {/* Logo */}
             <div className="mb-4">
-              <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
-              <div className="bg-gold px-4 py-1 font-medium text-sm">
-                UMKHONTO WESIZWE
+              <div className="flex items-center gap-3 mb-2">
+                <img 
+                  src="/lovable-uploads/e91116c1-e7fb-4dfb-93bb-7b8d5e7f521e.png" 
+                  alt="Tholispane" 
+                  className="h-12" 
+                />
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-1">MK PARTY</h2>
+                  <div className="bg-gold px-4 py-1 font-medium text-sm">
+                    UMKHONTO WESIZWE
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -35,21 +44,6 @@ const Footer = () => {
 
           {/* Right Column - Slogan, Contact, and Social */}
           <div className="flex flex-col items-end">
-            {/* Party Logo with Image */}
-            <div className="flex items-center gap-4 mb-8 justify-end">
-              <div className="text-right">
-                <h3 className="text-2xl font-bold text-white mb-1">OFFICIAL</h3>
-                <div className="bg-gold px-4 py-1 font-medium text-sm">
-                  THOLISPANE
-                </div>
-              </div>
-              <img 
-                src="/lovable-uploads/e91116c1-e7fb-4dfb-93bb-7b8d5e7f521e.png" 
-                alt="Tholispane" 
-                className="h-20 w-auto" 
-              />
-            </div>
-            
             {/* Slogan */}
             <div className="border border-white p-4 mb-6 text-center md:text-right max-w-md">
               <p className="text-sm">
