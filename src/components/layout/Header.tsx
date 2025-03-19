@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Menu, X, User, LogOut } from "lucide-react";
@@ -29,29 +28,26 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Handle drawer open/close effects
   const handleDrawerOpenChange = (open: boolean) => {
     setIsMenuOpen(open);
     
     if (open) {
-      // When opening, immediately prevent scrolling
       document.body.style.overflow = "hidden";
     } else {
-      // When closing, restore scrolling
-      // Reset overflow to empty string (browser default) rather than "auto"
       document.body.style.overflow = "";
     }
   };
 
-  // Effect to ensure body scroll is restored if component unmounts while drawer is open
   useEffect(() => {
     return () => {
-      // Clean up by restoring scroll when component unmounts
       document.body.style.overflow = "";
     };
   }, []);
 
-  const closeMenu = () => setIsMenuOpen(false);
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    document.body.style.overflow = "";
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -69,7 +65,6 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
-        {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
           <img
             src="/logo.svg"
@@ -79,7 +74,6 @@ const Header = () => {
           <span className="font-heading text-xl font-medium">MK Party</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           <Link
             to="/events"
@@ -133,7 +127,6 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Mobile Navigation Drawer */}
         <div className="md:hidden">
           <Drawer open={isMenuOpen} onOpenChange={handleDrawerOpenChange}>
             <DrawerTrigger asChild>
@@ -146,13 +139,12 @@ const Header = () => {
               </Button>
             </DrawerTrigger>
             <DrawerContent className="h-[85vh] pt-5">
-              {/* Add a hidden DrawerTitle for accessibility */}
               <DrawerTitle className="sr-only">Navigation Menu</DrawerTitle>
               
               <div className="flex justify-between items-center px-4 mb-4">
                 <h2 className="text-lg font-medium">Menu</h2>
                 <DrawerClose asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" onClick={closeMenu}>
                     <X size={24} className="animate-scale" />
                     <span className="sr-only">Close</span>
                   </Button>

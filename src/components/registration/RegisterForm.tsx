@@ -34,6 +34,37 @@ const stepIcons = [
   <CreditCard size={20} />
 ];
 
+// Sample data for dev mode
+const devModeData = {
+  idNumber: "9001015800083",
+  name: "John",
+  surname: "Developer",
+  dateOfBirth: "1990-01-01",
+  gender: "Male",
+  race: "White",
+  language: "English",
+  nationality: "South African",
+  employmentStatus: "Employed",
+  occupation: "Software Developer",
+  disability: "No",
+  email: "dev@example.com",
+  cellphone: "0721234567",
+  address: "123 Dev Street",
+  addressLine2: "Silicon Valley",
+  postalCode: "2000",
+  province: "Gauteng",
+  municipality: "Johannesburg Metro",
+  ward: "Ward 123",
+  votingStation: "Central Library",
+  emailConfirmation: true,
+  membershipType: "Standard",
+  acceptTerms: true,
+  paymentMethod: "EFT",
+  paymentAmount: "100",
+  photoUrl: "",
+  paymentCompleted: false,
+};
+
 const RegisterForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -77,6 +108,24 @@ const RegisterForm = () => {
   const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
   const [validationEnabled, setValidationEnabled] = useState(true);
   const [submissionComplete, setSubmissionComplete] = useState(false);
+  const [devMode, setDevMode] = useState(true);
+
+  // Handle toggling dev mode
+  const toggleDevMode = (enabled: boolean) => {
+    setDevMode(enabled);
+    setValidationEnabled(enabled);
+    
+    // If turning off dev mode, populate with sample data
+    if (!enabled) {
+      setFormData(devModeData);
+      setIsIDValid(true);
+    } else {
+      // If turning dev mode back on, you might want to reset the form
+      // Uncomment below if you want to reset when turning on
+      // setFormData({...initialFormData});
+      // setIsIDValid(false);
+    }
+  };
 
   // Handle ID Number validation and auto-populate
   useEffect(() => {
@@ -293,20 +342,20 @@ const RegisterForm = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Dev Mode - Validation Toggle */}
-      <div className="fixed top-4 right-4 z-50 bg-mkneutral-800/80 backdrop-blur-sm p-3 rounded-lg shadow-lg flex items-center gap-2 text-white">
+      {/* Dev Mode - Validation Toggle - Fixed to right side of screen */}
+      <div className="fixed top-24 right-4 z-50 bg-mkneutral-800/80 backdrop-blur-sm p-3 rounded-lg shadow-lg flex items-center gap-2 text-white">
         <Label htmlFor="validation-toggle" className="text-sm font-medium cursor-pointer flex items-center">
           <code className="bg-mkneutral-700 px-2 py-1 rounded text-xs mr-2">DEV MODE</code>
-          Form Validation
+          <span className="mr-2">Auto-fill Form</span>
         </Label>
         <Switch
           id="validation-toggle"
-          checked={validationEnabled}
-          onCheckedChange={setValidationEnabled}
+          checked={!devMode}
+          onCheckedChange={(checked) => toggleDevMode(!checked)}
           className="data-[state=checked]:bg-primary-600"
         />
         <span className="text-xs text-mkneutral-300 ml-1">
-          {validationEnabled ? 'On' : 'Off'}
+          {!devMode ? 'On' : 'Off'}
         </span>
       </div>
 
@@ -1114,4 +1163,3 @@ const RegisterForm = () => {
 };
 
 export default RegisterForm;
-
