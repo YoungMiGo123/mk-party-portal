@@ -24,7 +24,7 @@ const DashboardHeader = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight text-mkneutral-900">
-            Member Dashboard
+            Dashboard
           </h1>
           <p className="text-mkneutral-600 mt-2">
             Welcome back, {user?.name}! Manage your membership and stay connected with the party.

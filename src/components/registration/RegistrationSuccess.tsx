@@ -22,7 +22,7 @@ const RegistrationSuccess = ({ formData, handleLoginAfterPayment }: Registration
       <div className="p-8 text-center">
         <p className="text-xl font-medium text-mkneutral-700 mb-3">Thank you for joining!</p>
         <p className="text-mkneutral-500 mb-8">
-          Your membership registration has been successfully processed. You can now access your membership card and benefits.
+          Your membership registration has been successfully processed. You can now access your dashboard and benefits.
         </p>
         
         <div className="max-w-md mx-auto p-6 bg-cream-50 rounded-xl mb-8">
@@ -51,7 +51,7 @@ const RegistrationSuccess = ({ formData, handleLoginAfterPayment }: Registration
           onClick={handleLoginAfterPayment}
           className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-2.5 rounded-full"
         >
-          View My Membership Card
+          Go to Dashboard
         </Button>
       </div>
     </Card>

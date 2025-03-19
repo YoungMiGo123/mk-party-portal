@@ -235,7 +235,7 @@ const RegisterForm = () => {
       "dummy-token"
     );
     
-    navigate("/membership-card");
+    navigate("/dashboard");
   };
 
   return (
