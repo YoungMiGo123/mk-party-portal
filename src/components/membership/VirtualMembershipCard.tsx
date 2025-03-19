@@ -44,7 +44,7 @@ const VirtualMembershipCard = ({
         {/* Logo and Card Title */}
         <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/lovable-uploads/e91116c1-e7fb-4dfb-93bb-7b8d5e7f521e.png" alt="MK Party" className="h-8 w-auto mr-2" />
+            <img src="/logo.png" alt="MK Party" className="h-8 w-auto mr-2" />
             <span className="text-white font-heading font-bold tracking-wide">MK PARTY</span>
           </div>
           <div className="text-white/90 text-xs font-medium">
