@@ -35,7 +35,7 @@ const Footer = () => {
                 href="https://twitter.com/MKParty" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="bg-green-500 p-3 rounded-full hover:bg-green-600 transition-colors"
+                className="bg-green-600 p-3 rounded-full hover:bg-green-700 transition-colors"
               >
                 <Twitter size={20} className="text-white" />
               </a>
@@ -43,7 +43,7 @@ const Footer = () => {
                 href="https://www.facebook.com/mkparty" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="bg-green-500 p-3 rounded-full hover:bg-green-600 transition-colors"
+                className="bg-green-600 p-3 rounded-full hover:bg-green-700 transition-colors"
               >
                 <Facebook size={20} className="text-white" />
               </a>
@@ -51,7 +51,7 @@ const Footer = () => {
                 href="https://www.youtube.com/mkparty" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="bg-green-500 p-3 rounded-full hover:bg-green-600 transition-colors"
+                className="bg-green-600 p-3 rounded-full hover:bg-green-700 transition-colors"
               >
                 <Youtube size={20} className="text-white" />
               </a>
