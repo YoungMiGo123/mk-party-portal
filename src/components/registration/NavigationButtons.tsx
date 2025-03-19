@@ -1,5 +1,5 @@
 
-import { ChevronLeft, ChevronRight, DollarSign, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, DollarSign, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface NavigationButtonsProps {
@@ -8,6 +8,8 @@ interface NavigationButtonsProps {
   handlePrevious: () => void;
   handleNext: () => void;
   isLoading: boolean;
+  isPaymentComplete?: boolean;
+  handleCompleteRegistration?: () => void;
 }
 
 const NavigationButtons = ({
@@ -16,6 +18,8 @@ const NavigationButtons = ({
   handlePrevious,
   handleNext,
   isLoading,
+  isPaymentComplete = false,
+  handleCompleteRegistration,
 }: NavigationButtonsProps) => {
   return (
     <div className="mt-8 flex justify-between">
@@ -24,6 +28,7 @@ const NavigationButtons = ({
           type="button"
           onClick={handlePrevious}
           className="bg-mkneutral-100 text-mkneutral-700 hover:bg-mkneutral-200"
+          disabled={isLoading}
         >
           <ChevronLeft className="mr-2 h-4 w-4" /> Previous
         </Button>
@@ -40,21 +45,33 @@ const NavigationButtons = ({
           Next <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       ) : (
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="bg-primary-600 hover:bg-primary-700 text-white"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
-            </>
+        <>
+          {isPaymentComplete ? (
+            <Button
+              type="button"
+              onClick={handleCompleteRegistration}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" /> Complete Registration
+            </Button>
           ) : (
-            <>
-              Complete Registration <DollarSign className="ml-2 h-4 w-4" />
-            </>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-primary-600 hover:bg-primary-700 text-white"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
+                </>
+              ) : (
+                <>
+                  Process Payment <DollarSign className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
           )}
-        </Button>
+        </>
       )}
     </div>
   );
