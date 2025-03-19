@@ -60,28 +60,10 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           <Link
-            to="/"
-            className={`nav-link ${isActive("/") ? "active" : ""}`}
-          >
-            Home
-          </Link>
-          <Link
-            to="/about"
-            className={`nav-link ${isActive("/about") ? "active" : ""}`}
-          >
-            About Us
-          </Link>
-          <Link
             to="/events"
             className={`nav-link ${isActive("/events") ? "active" : ""}`}
           >
             Events
-          </Link>
-          <Link
-            to="/contact"
-            className={`nav-link ${isActive("/contact") ? "active" : ""}`}
-          >
-            Contact
           </Link>
           
           {isAuthenticated ? (
@@ -148,32 +130,11 @@ const Header = () => {
         <div className="container mx-auto pt-20 px-4 h-full overflow-y-auto">
           <div className="flex flex-col space-y-6">
             <Link
-              to="/"
-              className="text-lg font-medium py-2"
-              onClick={closeMenu}
-            >
-              Home
-            </Link>
-            <Link
-              to="/about"
-              className="text-lg font-medium py-2"
-              onClick={closeMenu}
-            >
-              About Us
-            </Link>
-            <Link
               to="/events"
               className="text-lg font-medium py-2"
               onClick={closeMenu}
             >
               Events
-            </Link>
-            <Link
-              to="/contact"
-              className="text-lg font-medium py-2"
-              onClick={closeMenu}
-            >
-              Contact
             </Link>
             
             <div className="pt-4 border-t border-mkneutral-100">

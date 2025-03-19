@@ -9,14 +9,14 @@ const Register = () => {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       
-      <main className="flex-grow pt-16 pb-16">
+      <main className="flex-grow pt-20 pb-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
-              Join our membership
+              Member Registration
             </h1>
             <p className="text-mkneutral-500 max-w-2xl mx-auto">
-              Complete the registration form below to create your account and access member benefits
+              Complete the registration form below to create your account
             </p>
           </div>
           
