@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -373,7 +374,7 @@ const RegisterForm = () => {
                 `}
               >
                 <div className="hidden sm:flex sm:items-center">
-                  <span className={`w-6 h-6 rounded-full bg-mkneutral-100 flex items-center justify-center mr-2 
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center mr-2 
                     ${currentStep === index ? "bg-primary-100 text-primary-600" : 
                      currentStep > index ? "bg-primary-600 text-white" : "bg-mkneutral-100 text-mkneutral-500"}`}>
                     {currentStep > index ? <Check size={14} /> : index + 1}
@@ -758,7 +759,7 @@ const RegisterForm = () => {
                         name="address"
                         value={formData.address}
                         onChange={handleChange}
-                        className={`form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm ${errors.address ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                        className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.address ? "border-red-500 ring-1 ring-red-500" : ""}`}
                         placeholder="Street address"
                       />
                       {errors.address && (
@@ -777,7 +778,7 @@ const RegisterForm = () => {
                         name="addressLine2"
                         value={formData.addressLine2}
                         onChange={handleChange}
-                        className="form-input rounded-xl bg-green-50 border-mkneutral-200 shadow-sm"
+                        className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
                         placeholder="Apartment, suite, unit, etc."
                       />
                     </div>
@@ -789,4 +790,328 @@ const RegisterForm = () => {
                       <Input
                         id="postalCode"
                         name="postalCode"
-                        value={
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                        className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
+                        placeholder="0000"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="province" className="text-mkneutral-700 font-medium">
+                        Province
+                      </Label>
+                      <Select
+                        name="province"
+                        value={formData.province}
+                        onValueChange={(value) => handleSelectChange("province", value)}
+                      >
+                        <SelectTrigger className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm h-12">
+                          <SelectValue placeholder="Select province" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", "Limpopo", "Mpumalanga", "Northern Cape", "North West", "Western Cape"].map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-mkneutral-100 bg-cream-50 p-4 rounded-xl">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="emailConfirmation"
+                        checked={formData.emailConfirmation}
+                        onCheckedChange={(checked) => 
+                          handleCheckboxChange("emailConfirmation", checked as boolean)
+                        }
+                        className="rounded border-primary-500 text-primary-600 focus:ring-primary-500/20"
+                      />
+                      <Label htmlFor="emailConfirmation" className="text-sm cursor-pointer text-mkneutral-700">
+                        I would like to receive email updates about membership benefits
+                      </Label>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 3: Membership Details */}
+              {currentStep === 2 && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={variants}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-2 mb-6">
+                    <h2 className="text-2xl font-heading font-medium text-primary-700 flex items-center">
+                      <FileCheck size={22} className="mr-2 text-primary-500" /> Membership Details
+                    </h2>
+                    <p className="text-mkneutral-500">Help us understand your local context</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="membershipType" className="text-mkneutral-700 font-medium">
+                        Membership Type <span className="text-red-500">*</span>
+                      </Label>
+                      <RadioGroup 
+                        defaultValue={formData.membershipType}
+                        onValueChange={(value) => handleSelectChange("membershipType", value)}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 rounded-lg border border-mkneutral-200 p-3 bg-cream-50 hover:bg-cream-100 transition-colors">
+                          <RadioGroupItem 
+                            value="Standard" 
+                            id="standard-membership" 
+                            className="text-primary-600" 
+                          />
+                          <Label htmlFor="standard-membership" className="font-medium cursor-pointer">Standard Membership</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 rounded-lg border border-mkneutral-200 p-3 bg-cream-50 hover:bg-cream-100 transition-colors">
+                          <RadioGroupItem 
+                            value="Premium" 
+                            id="premium-membership" 
+                            className="text-primary-600" 
+                          />
+                          <Label htmlFor="premium-membership" className="font-medium cursor-pointer">Premium Membership</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="municipality" className="text-mkneutral-700 font-medium">
+                        Municipality
+                      </Label>
+                      <Input
+                        id="municipality"
+                        name="municipality"
+                        value={formData.municipality}
+                        onChange={handleChange}
+                        className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
+                        placeholder="e.g. Johannesburg Metro"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="ward" className="text-mkneutral-700 font-medium">
+                        Ward
+                      </Label>
+                      <Input
+                        id="ward"
+                        name="ward"
+                        value={formData.ward}
+                        onChange={handleChange}
+                        className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
+                        placeholder="e.g. Ward 77"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="votingStation" className="text-mkneutral-700 font-medium">
+                        Voting Station
+                      </Label>
+                      <Input
+                        id="votingStation"
+                        name="votingStation"
+                        value={formData.votingStation}
+                        onChange={handleChange}
+                        className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
+                        placeholder="Your local voting station"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-6 mt-6 border border-primary-100 rounded-xl bg-primary-50 shadow-sm">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center mr-4">
+                        <FileCheck className="h-6 w-6 text-primary-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-primary-700">Membership Benefits</h3>
+                        <p className="text-sm text-mkneutral-600">Access to exclusive member areas, voting rights, and more</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 4: Membership Oath */}
+              {currentStep === 3 && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={variants}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-2 mb-6">
+                    <h2 className="text-2xl font-heading font-medium text-primary-700 flex items-center">
+                      <Check size={22} className="mr-2 text-primary-500" /> Membership Oath
+                    </h2>
+                    <p className="text-mkneutral-500">Please read and accept the membership oath</p>
+                  </div>
+
+                  <div className="bg-cream-50 p-6 rounded-xl border border-mkneutral-200">
+                    <h3 className="font-medium text-lg text-mkneutral-800 mb-4">Membership Declaration</h3>
+                    <div className="prose prose-sm mb-6 text-mkneutral-700">
+                      <p>I, the undersigned, hereby solemnly declare that:</p>
+                      <ul className="space-y-2 list-disc pl-5">
+                        <li>I am joining this membership of my own free will</li>
+                        <li>I will abide by the constitution and code of conduct</li>
+                        <li>I will participate in the activities of the organization</li>
+                        <li>I will uphold the values and principles of the organization</li>
+                        <li>All the information I have provided is true and accurate</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="acceptTerms"
+                        checked={formData.acceptTerms}
+                        onCheckedChange={(checked) => 
+                          handleCheckboxChange("acceptTerms", checked as boolean)
+                        }
+                        className={`rounded border-primary-500 text-primary-600 focus:ring-primary-500/20 ${errors.acceptTerms ? "border-red-500" : ""}`}
+                      />
+                      <Label htmlFor="acceptTerms" className="text-sm font-medium cursor-pointer text-mkneutral-700">
+                        I accept the membership oath declaration
+                      </Label>
+                    </div>
+                    {errors.acceptTerms && (
+                      <p className="form-error flex items-center text-xs mt-2">
+                        <AlertCircle size={12} className="mr-1" /> {errors.acceptTerms}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 5: Payment */}
+              {currentStep === 4 && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={variants}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-2 mb-6">
+                    <h2 className="text-2xl font-heading font-medium text-primary-700 flex items-center">
+                      <CreditCard size={22} className="mr-2 text-primary-500" /> Registration Payment
+                    </h2>
+                    <p className="text-mkneutral-500">Finalize your membership with a payment</p>
+                  </div>
+
+                  <div className="bg-cream-50 p-6 rounded-xl border border-mkneutral-200 mb-6">
+                    <h3 className="font-medium text-lg text-mkneutral-800 mb-4">Select Payment Method</h3>
+                    
+                    <RadioGroup 
+                      defaultValue={formData.paymentMethod}
+                      onValueChange={(value) => handleSelectChange("paymentMethod", value)}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-2 rounded-lg border border-mkneutral-200 p-3 bg-white hover:bg-cream-100 transition-colors">
+                        <RadioGroupItem 
+                          value="CreditCard" 
+                          id="credit-card" 
+                          className="text-primary-600" 
+                        />
+                        <Label htmlFor="credit-card" className="font-medium cursor-pointer flex items-center">
+                          <CreditCard size={18} className="mr-2" /> Credit/Debit Card
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2 rounded-lg border border-mkneutral-200 p-3 bg-white hover:bg-cream-100 transition-colors">
+                        <RadioGroupItem 
+                          value="EFT" 
+                          id="eft" 
+                          className="text-primary-600" 
+                        />
+                        <Label htmlFor="eft" className="font-medium cursor-pointer flex items-center">
+                          <DollarSign size={18} className="mr-2" /> Electronic Funds Transfer (EFT)
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    
+                    <div className="mt-6">
+                      <Label htmlFor="paymentAmount" className="text-mkneutral-700 font-medium block mb-2">
+                        Donation Amount (R) <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="paymentAmount"
+                        name="paymentAmount"
+                        type="number"
+                        value={formData.paymentAmount}
+                        onChange={handleChange}
+                        className={`form-input rounded-xl bg-white border-mkneutral-200 shadow-sm max-w-xs ${errors.paymentAmount ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                        min="20"
+                      />
+                      {errors.paymentAmount && (
+                        <p className="form-error flex items-center text-xs mt-2">
+                          <AlertCircle size={12} className="mr-1" /> {errors.paymentAmount}
+                        </p>
+                      )}
+                      <p className="text-sm text-mkneutral-500 mt-2">
+                        Minimum donation amount: R20
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {isLoading ? (
+                    <div className="flex justify-center py-4">
+                      <div className="flex items-center space-x-2">
+                        <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
+                        <span className="text-mkneutral-700">Processing payment...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 rounded-xl shadow-sm flex items-center justify-center"
+                    >
+                      Complete Registration & Make Payment
+                    </Button>
+                  )}
+                </motion.div>
+              )}
+
+              {/* Form Navigation Buttons */}
+              {currentStep < 4 && (
+                <div className="flex justify-between mt-8 pt-4 border-t border-mkneutral-100">
+                  {currentStep > 0 ? (
+                    <Button
+                      type="button"
+                      onClick={handlePrevious}
+                      className="bg-cream-50 text-mkneutral-700 hover:bg-cream-100 border border-mkneutral-200"
+                    >
+                      <ChevronLeft size={16} className="mr-1" /> Previous
+                    </Button>
+                  ) : (
+                    <div></div>
+                  )}
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="bg-primary-600 hover:bg-primary-700 text-white"
+                  >
+                    Next <ChevronRight size={16} className="ml-1" />
+                  </Button>
+                </div>
+              )}
+            </form>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default RegisterForm;
+
