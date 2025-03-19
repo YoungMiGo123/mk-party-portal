@@ -4,6 +4,12 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/authStore";
+import { 
+  Drawer,
+  DrawerContent,
+  DrawerClose,
+  DrawerTrigger
+} from "@/components/ui/drawer";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +39,6 @@ const Header = () => {
     };
   }, [isMenuOpen]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
   const isActive = (path: string) => location.pathname === path;
@@ -116,84 +121,87 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Mobile Navigation Toggle */}
-        <button
-          className="md:hidden p-2 rounded-md focus:outline-none"
-          onClick={toggleMenu}
-          aria-label="Toggle mobile menu"
-        >
-          {isMenuOpen ? (
-            <X size={24} className="animate-scale" />
-          ) : (
-            <Menu size={24} className="animate-scale" />
-          )}
-        </button>
-      </div>
-
-      {/* Mobile Navigation Menu */}
-      <div
-        className={`fixed inset-0 z-40 bg-white transform transition-transform duration-300 ease-in-out ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="container mx-auto pt-20 px-4 h-full overflow-y-auto">
-          <div className="flex flex-col space-y-6">
-            <Link
-              to="/events"
-              className="text-lg font-medium py-2"
-              onClick={closeMenu}
-            >
-              Events
-            </Link>
-            
-            <div className="pt-4 border-t border-mkneutral-100">
-              {isAuthenticated ? (
-                <div className="flex flex-col space-y-4">
-                  <Link
-                    to="/dashboard"
-                    className="flex items-center space-x-2 text-lg font-medium py-2"
-                    onClick={closeMenu}
-                  >
-                    <User size={20} />
-                    <span>My Dashboard</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      closeMenu();
-                      handleLogout();
-                    }}
-                    className="flex items-center space-x-2 text-lg font-medium py-2 text-red-500"
-                  >
-                    <LogOut size={20} />
-                    <span>Log Out</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col space-y-4">
-                  <Button
-                    variant="outline"
-                    className="w-full text-center py-6"
-                    onClick={() => {
-                      closeMenu();
-                      navigate("/login");
-                    }}
-                  >
-                    Log in
+        {/* Mobile Navigation Drawer */}
+        <div className="md:hidden">
+          <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <DrawerTrigger asChild>
+              <Button
+                className="p-2 rounded-md focus:outline-none"
+                variant="ghost"
+                aria-label="Toggle mobile menu"
+              >
+                <Menu size={24} className="animate-scale" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="h-[85vh] pt-5">
+              <div className="flex justify-between items-center px-4 mb-4">
+                <h2 className="text-lg font-medium">Menu</h2>
+                <DrawerClose asChild>
+                  <Button variant="ghost" size="icon">
+                    <X size={24} className="animate-scale" />
+                    <span className="sr-only">Close</span>
                   </Button>
-                  <Button
-                    variant="default"
-                    className="w-full text-center bg-primary hover:bg-primary/90 py-6"
-                    onClick={() => {
-                      closeMenu();
-                      navigate("/register");
-                    }}
-                  >
-                    Register
-                  </Button>
+                </DrawerClose>
+              </div>
+              <div className="px-4 flex flex-col space-y-6">
+                <Link
+                  to="/events"
+                  className="text-lg font-medium py-2"
+                  onClick={closeMenu}
+                >
+                  Events
+                </Link>
+                
+                <div className="pt-4 border-t border-mkneutral-100">
+                  {isAuthenticated ? (
+                    <div className="flex flex-col space-y-4">
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center space-x-2 text-lg font-medium py-2"
+                        onClick={closeMenu}
+                      >
+                        <User size={20} />
+                        <span>My Dashboard</span>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          closeMenu();
+                          handleLogout();
+                        }}
+                        className="flex items-center space-x-2 text-lg font-medium py-2 text-red-500"
+                      >
+                        <LogOut size={20} />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col space-y-4">
+                      <Button
+                        variant="outline"
+                        className="w-full text-center py-6"
+                        onClick={() => {
+                          closeMenu();
+                          navigate("/login");
+                        }}
+                      >
+                        Log in
+                      </Button>
+                      <Button
+                        variant="default"
+                        className="w-full text-center bg-primary hover:bg-primary/90 py-6"
+                        onClick={() => {
+                          closeMenu();
+                          navigate("/register");
+                        }}
+                      >
+                        Register
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
       </div>
     </header>
