@@ -8,6 +8,9 @@ import { extractDateFromSAID, extractGenderFromSAID, generateMembershipNumber } 
 // Import step components
 import PersonalDetailsStep from "./steps/PersonalDetailsStep";
 import ContactDetailsStep from "./steps/ContactDetailsStep";
+import MembershipDetailsStep from "./steps/MembershipDetailsStep";
+import MembershipOathStep from "./steps/MembershipOathStep";
+import PaymentStep from "./steps/PaymentStep";
 import DevModeToggle from "./DevModeToggle";
 import RegistrationSuccess from "./RegistrationSuccess";
 import NavigationButtons from "./NavigationButtons";
@@ -284,6 +287,40 @@ const RegisterForm = () => {
                   formData={formData}
                   errors={errors}
                   handleChange={handleChange}
+                  handleSelectChange={handleSelectChange}
+                  handleCheckboxChange={handleCheckboxChange}
+                  variants={motionVariants}
+                />
+              )}
+              
+              {/* Step 3: Membership Details */}
+              {currentStep === 2 && (
+                <MembershipDetailsStep
+                  formData={formData}
+                  errors={errors}
+                  handleChange={handleChange}
+                  handleSelectChange={handleSelectChange}
+                  variants={motionVariants}
+                />
+              )}
+              
+              {/* Step 4: Membership Oath */}
+              {currentStep === 3 && (
+                <MembershipOathStep
+                  formData={formData}
+                  errors={errors}
+                  handleCheckboxChange={handleCheckboxChange}
+                  variants={motionVariants}
+                />
+              )}
+              
+              {/* Step 5: Payment */}
+              {currentStep === 4 && (
+                <PaymentStep
+                  formData={formData}
+                  errors={errors}
+                  handleChange={handleChange}
+                  handleSelectChange={handleSelectChange}
                   variants={motionVariants}
                 />
               )}

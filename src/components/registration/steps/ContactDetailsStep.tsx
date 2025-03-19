@@ -3,11 +3,16 @@ import { motion } from "framer-motion";
 import { AlertCircle, Bookmark } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { mockOptions } from "@/lib/mockData";
 
 interface ContactDetailsStepProps {
   formData: any;
   errors: Record<string, string>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleSelectChange?: (name: string, value: string) => void;
+  handleCheckboxChange?: (name: string, checked: boolean) => void;
   variants: any;
 }
 
@@ -15,6 +20,8 @@ const ContactDetailsStep = ({
   formData,
   errors,
   handleChange,
+  handleSelectChange,
+  handleCheckboxChange,
   variants,
 }: ContactDetailsStepProps) => {
   return (
@@ -76,7 +83,77 @@ const ContactDetailsStep = ({
           )}
         </div>
         
-        {/* Additional fields would go here */}
+        <div className="space-y-2">
+          <Label htmlFor="address" className="text-mkneutral-700 font-medium">
+            Residential Address <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="address"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.address ? "border-red-500 ring-1 ring-red-500" : ""}`}
+            placeholder="Enter your street address"
+          />
+          {errors.address && (
+            <p className="form-error flex items-center text-xs">
+              <AlertCircle size={12} className="mr-1" /> {errors.address}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="addressLine2" className="text-mkneutral-700 font-medium">
+            Address Line 2
+          </Label>
+          <Input
+            id="addressLine2"
+            name="addressLine2"
+            value={formData.addressLine2}
+            onChange={handleChange}
+            className="form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm"
+            placeholder="Apartment, suite, unit, etc."
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="postalCode" className="text-mkneutral-700 font-medium">
+            Postal Code <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="postalCode"
+            name="postalCode"
+            value={formData.postalCode}
+            onChange={handleChange}
+            className={`form-input rounded-xl bg-cream-50 border-mkneutral-200 shadow-sm ${errors.postalCode ? "border-red-500 ring-1 ring-red-500" : ""}`}
+            placeholder="Enter postal code"
+            maxLength={4}
+          />
+          {errors.postalCode && (
+            <p className="form-error flex items-center text-xs">
+              <AlertCircle size={12} className="mr-1" /> {errors.postalCode}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-start space-x-2">
+            {handleCheckboxChange && (
+              <Checkbox 
+                id="emailConfirmation" 
+                checked={formData.emailConfirmation} 
+                onCheckedChange={(checked) => handleCheckboxChange("emailConfirmation", checked === true)}
+                className="mt-1"
+              />
+            )}
+            <Label 
+              htmlFor="emailConfirmation" 
+              className="text-mkneutral-700 font-medium cursor-pointer text-sm"
+            >
+              I would like to receive emails about party events and updates
+            </Label>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
