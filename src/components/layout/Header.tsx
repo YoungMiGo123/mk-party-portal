@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Menu, X, User, LogOut } from "lucide-react";
@@ -67,9 +68,9 @@ const Header = () => {
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
           <img
-            src="/logo.svg"
+            src="/logo.png"
             alt="MK Party"
-            className="h-10 w-auto object-contain"
+            className="h-10 w-10 rounded-full object-contain"
           />
           <span className="font-heading text-xl font-medium">MK Party</span>
         </Link>
