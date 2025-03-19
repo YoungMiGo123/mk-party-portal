@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -256,32 +257,22 @@ const Dashboard = () => {
                   </Card>
                   
                   <div className="lg:hidden mb-6">
-                    <TabsList className="w-full grid grid-cols-3">
-                      <TabsTrigger 
-                        value="profile"
-                        onClick={() => setActiveTab("profile")}
-                        className={activeTab === "profile" ? "data-[state=active]:bg-primary data-[state=active]:text-white" : ""}
-                      >
-                        <User size={16} className="mr-2" />
-                        Profile
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="events" 
-                        onClick={() => setActiveTab("events")}
-                        className={activeTab === "events" ? "data-[state=active]:bg-primary data-[state=active]:text-white" : ""}
-                      >
-                        <CalendarCheck size={16} className="mr-2" />
-                        Events
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="polls"
-                        onClick={() => setActiveTab("polls")}
-                        className={activeTab === "polls" ? "data-[state=active]:bg-primary data-[state=active]:text-white" : ""}
-                      >
-                        <BarChart3 size={16} className="mr-2" />
-                        Polls
-                      </TabsTrigger>
-                    </TabsList>
+                    <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
+                      <TabsList className="w-full grid grid-cols-3">
+                        <TabsTrigger value="profile">
+                          <User size={16} className="mr-2" />
+                          Profile
+                        </TabsTrigger>
+                        <TabsTrigger value="events">
+                          <CalendarCheck size={16} className="mr-2" />
+                          Events
+                        </TabsTrigger>
+                        <TabsTrigger value="polls">
+                          <BarChart3 size={16} className="mr-2" />
+                          Polls
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                   </div>
                   
                   <Card className="shadow-glass-sm hidden lg:block">
@@ -338,8 +329,8 @@ const Dashboard = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
-                  {activeTab === "profile" && (
-                    <div className="space-y-6">
+                  <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                    <TabsContent value="profile" className="space-y-6">
                       <Card className="shadow-glass-sm overflow-hidden">
                         <CardHeader className="pb-2 flex flex-row justify-between items-center">
                           <div>
@@ -617,11 +608,9 @@ const Dashboard = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </div>
-                  )}
-                  
-                  {activeTab === "events" && (
-                    <div className="space-y-6">
+                    </TabsContent>
+                    
+                    <TabsContent value="events" className="space-y-6">
                       <Card className="shadow-glass-sm">
                         <CardHeader>
                           <CardTitle>Upcoming Events</CardTitle>
@@ -688,11 +677,9 @@ const Dashboard = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </div>
-                  )}
-                  
-                  {activeTab === "polls" && (
-                    <div className="space-y-6">
+                    </TabsContent>
+                    
+                    <TabsContent value="polls" className="space-y-6">
                       <Card className="shadow-glass-sm">
                         <CardHeader>
                           <CardTitle>Polls & Surveys</CardTitle>
@@ -769,8 +756,8 @@ const Dashboard = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </div>
-                  )}
+                    </TabsContent>
+                  </Tabs>
                 </motion.div>
               </div>
             </div>

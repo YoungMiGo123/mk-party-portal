@@ -68,10 +68,17 @@ const Header = () => {
           
           {isAuthenticated ? (
             <div className="flex items-center ml-4 space-x-2">
-              <div className="flex items-center space-x-1 rounded-full bg-secondary px-3 py-1.5">
-                <User size={16} className="text-mkneutral-500" />
+              <Link
+                to="/dashboard"
+                className={`flex items-center space-x-1 rounded-full ${
+                  isActive("/dashboard") 
+                    ? "bg-primary/10 text-primary" 
+                    : "bg-secondary text-mkneutral-500 hover:bg-primary/5 hover:text-primary"
+                } px-3 py-1.5 transition-colors`}
+              >
+                <User size={16} />
                 <span className="text-sm font-medium">{user?.name}</span>
-              </div>
+              </Link>
               <Button
                 variant="ghost"
                 size="sm"
@@ -146,7 +153,7 @@ const Header = () => {
                     onClick={closeMenu}
                   >
                     <User size={20} />
-                    <span>My Profile</span>
+                    <span>My Dashboard</span>
                   </Link>
                   <button
                     onClick={() => {
