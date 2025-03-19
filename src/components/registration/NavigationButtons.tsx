@@ -56,7 +56,8 @@ const NavigationButtons = ({
             </Button>
           ) : (
             <Button
-              type="submit"
+              type="button" 
+              onClick={handleNext}
               disabled={isLoading}
               className="bg-primary-600 hover:bg-primary-700 text-white"
             >

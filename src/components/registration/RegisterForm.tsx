@@ -174,9 +174,35 @@ const RegisterForm = () => {
   // Handle next step
   const handleNext = () => {
     if (validateStep()) {
-      setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // If we're on the payment step, process the payment
+      if (currentStep === steps.length - 1) {
+        processPayment();
+      } else {
+        // Otherwise, just move to the next step
+        setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
+  };
+
+  // Process payment
+  const processPayment = () => {
+    setIsLoading(true);
+    
+    // Simulate payment processing
+    setTimeout(() => {
+      setFormData(prev => ({
+        ...prev,
+        paymentCompleted: true,
+      }));
+      
+      toast({
+        title: "Payment Successful",
+        description: "Your payment has been processed. Please complete your registration.",
+      });
+      
+      setIsLoading(false);
+    }, 2000);
   };
 
   // Handle previous step
@@ -185,29 +211,11 @@ const RegisterForm = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handle form submission - modified to not automatically complete the registration
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (currentStep === steps.length - 1) {
-      if (validateStep()) {
-        setIsLoading(true);
-        
-        setTimeout(() => {
-          setFormData(prev => ({
-            ...prev,
-            paymentCompleted: true,
-          }));
-          
-          toast({
-            title: "Payment Successful",
-            description: "Your payment has been processed. Please complete your registration.",
-          });
-          
-          setIsLoading(false);
-        }, 2000);
-      }
-    } else {
+    if (validateStep()) {
       handleNext();
     }
   };
