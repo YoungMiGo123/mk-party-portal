@@ -1,17 +1,20 @@
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/authStore";
+import { usePostLogoutRequest } from "@/api/auth/logout";
+import { log } from "console";
 
 const DesktopNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
+  const logoutRegister = usePostLogoutRequest();
 
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
+    logoutRegister.mutate();
     logout();
     navigate("/login", { replace: true });
   };
@@ -24,14 +27,14 @@ const DesktopNav = () => {
       >
         Events
       </Link>
-      
+
       {isAuthenticated ? (
         <div className="flex items-center ml-4 space-x-2">
           <Link
             to="/dashboard"
             className={`flex items-center space-x-1 rounded-full ${
-              isActive("/dashboard") 
-                ? "bg-primary/10 text-primary" 
+              isActive("/dashboard")
+                ? "bg-primary/10 text-primary"
                 : "bg-secondary text-mkneutral-500 hover:bg-primary/5 hover:text-primary"
             } px-3 py-1.5 transition-colors`}
           >

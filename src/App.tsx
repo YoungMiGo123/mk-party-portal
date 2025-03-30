@@ -1,8 +1,6 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Register from "./pages/Register";
@@ -15,17 +13,11 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "@/store/authStore";
-
-// Create a new home component that redirects based on auth status
-const Home = () => {
-  const { isAuthenticated } = useAuth();
-  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
-};
-
-const queryClient = new QueryClient();
+import { useToast } from "./hooks/use-toast";
+import ApiClientProvider from "./providers/ApiClientProvider";
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <ApiClientProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -38,16 +30,62 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/events" element={<Events />} />
-            <Route path="/membership-card" element={<MembershipCard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/admin" element={<Admin />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route
+              path="/membership-card"
+              element={
+                <GuardRoute description="You need to be logged in to view your membership card.">
+                  <MembershipCard />
+                </GuardRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <GuardRoute description="You need to be logged in to view your dashboard.">
+                  <Dashboard />
+                </GuardRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <GuardRoute description="You need to be an admin to view this page.">
+                  <Admin />
+                </GuardRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
+  </ApiClientProvider>
 );
 
 export default App;
+
+const Home = () => {
+  const { isAuthenticated } = useAuth();
+  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
+};
+
+interface GuardRouteProps extends React.PropsWithChildren {
+  description?: string;
+}
+
+const GuardRoute = (props: GuardRouteProps) => {
+  const { isAuthenticated, user } = useAuth();
+  const { toast } = useToast();
+
+  if (!isAuthenticated || !user) {
+    toast({
+      title: "Access Denied",
+      description:
+        props.description ?? "You need to be logged in to view page.",
+      variant: "destructive",
+    });
+    return <Navigate to="/login" />;
+  }
+
+  return <>{props.children}</>;
+};

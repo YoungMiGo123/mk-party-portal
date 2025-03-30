@@ -1,5 +1,5 @@
-
 import { User } from "@/store/authStore";
+import { getEnumValues, Province } from "@/utilities/enums";
 
 // Mock member users for admin panel
 export const mockMembers: User[] = [
@@ -24,7 +24,7 @@ export const mockMembers: User[] = [
     province: "Gauteng",
     ward: "Ward 42",
     votingStation: "Sandton Community Center",
-    joinDate: new Date().toISOString().split('T')[0],
+    joinDate: new Date().toISOString().split("T")[0],
   },
   {
     id: "2",
@@ -215,19 +215,9 @@ export const mockOptions = {
   membershipTypes: [
     { value: "Standard", label: "Standard Membership" },
     { value: "Premium", label: "Premium Membership" },
-    { value: "Volunteer", label: "Volunteer Member" }
+    { value: "Volunteer", label: "Volunteer Member" },
   ],
-  provinces: [
-    "Eastern Cape",
-    "Free State",
-    "Gauteng",
-    "KwaZulu-Natal",
-    "Limpopo",
-    "Mpumalanga",
-    "North West",
-    "Northern Cape",
-    "Western Cape",
-  ],
+  provinces: getEnumValues(Province),
   municipalities: [
     "Johannesburg Metro",
     "Cape Town Metro",
@@ -237,13 +227,14 @@ export const mockOptions = {
     "Buffalo City",
     "Mangaung",
     "Nelson Mandela Bay",
-    "Other Local Municipality"
+    "Other Local Municipality",
+    "JHB - City of Johannesburg",
   ],
   paymentMethods: [
     { value: "EFT", label: "Bank Transfer/EFT" },
     { value: "CreditCard", label: "Credit/Debit Card" },
-    { value: "Cash", label: "Cash Deposit" }
-  ]
+    { value: "Cash", label: "Cash Deposit" },
+  ],
 };
 
 // Helper function to extract date of birth from South African ID number
@@ -251,18 +242,18 @@ export const extractDateFromSAID = (idNumber: string): string | null => {
   if (!idNumber || idNumber.length !== 13) {
     return null;
   }
-  
+
   try {
     const year = idNumber.substring(0, 2);
     const month = idNumber.substring(2, 4);
     const day = idNumber.substring(4, 6);
-    
+
     // Determine century (1900s or 2000s)
     const currentYear = new Date().getFullYear();
-    const century = parseInt(year) > (currentYear % 100) ? "19" : "20";
-    
+    const century = parseInt(year) > currentYear % 100 ? "19" : "20";
+
     const fullYear = `${century}${year}`;
-    
+
     // Format as YYYY-MM-DD
     return `${fullYear}-${month}-${day}`;
   } catch (error) {
@@ -276,7 +267,7 @@ export const extractGenderFromSAID = (idNumber: string): string | null => {
   if (!idNumber || idNumber.length !== 13) {
     return null;
   }
-  
+
   try {
     // Gender is determined by the 7th digit (positions 6-9)
     // 0-4: Female, 5-9: Male

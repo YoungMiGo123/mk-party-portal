@@ -1,26 +1,27 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/authStore";
-import { 
+import {
   Drawer,
   DrawerContent,
   DrawerClose,
   DrawerTrigger,
-  DrawerTitle
+  DrawerTitle,
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useEffect } from "react";
+import { usePostLogoutRequest } from "@/api/auth/logout";
 
 const MobileNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
+  const logoutRegister = usePostLogoutRequest();
 
   const handleDrawerOpenChange = (open: boolean) => {
     setIsMenuOpen(open);
-    
+
     if (open) {
       document.body.style.overflow = "hidden";
     } else {
@@ -40,6 +41,7 @@ const MobileNav = () => {
   };
 
   const handleLogout = () => {
+    logoutRegister.mutate();
     logout();
     navigate("/login", { replace: true });
     closeMenu();
@@ -59,7 +61,7 @@ const MobileNav = () => {
         </DrawerTrigger>
         <DrawerContent className="h-[85vh] pt-5">
           <DrawerTitle className="sr-only">Navigation Menu</DrawerTitle>
-          
+
           <div className="flex justify-between items-center px-4 mb-4">
             <h2 className="text-lg font-medium">Menu</h2>
             <DrawerClose asChild>
@@ -69,7 +71,7 @@ const MobileNav = () => {
               </Button>
             </DrawerClose>
           </div>
-          
+
           <ScrollArea className="h-[calc(85vh-60px)] pb-6">
             <div className="px-4 flex flex-col space-y-6">
               <Link
@@ -79,7 +81,7 @@ const MobileNav = () => {
               >
                 Events
               </Link>
-              
+
               <div className="pt-4 border-t border-mkneutral-100">
                 {isAuthenticated ? (
                   <div className="flex flex-col space-y-4">

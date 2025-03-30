@@ -1,14 +1,19 @@
-
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PaymentVerificationData } from "@/api/payment/verify";
 
 interface RegistrationSuccessProps {
   formData: any;
+  paymentVerificationData: PaymentVerificationData;
   handleLoginAfterPayment: () => void;
 }
 
-const RegistrationSuccess = ({ formData, handleLoginAfterPayment }: RegistrationSuccessProps) => {
+const RegistrationSuccess = ({
+  formData,
+  paymentVerificationData,
+  handleLoginAfterPayment,
+}: RegistrationSuccessProps) => {
   return (
     <Card className="shadow-lg border-mkneutral-200 overflow-hidden rounded-xl">
       <div className="bg-gradient-to-r from-primary-600 to-primary-700 py-6 text-center">
@@ -20,17 +25,24 @@ const RegistrationSuccess = ({ formData, handleLoginAfterPayment }: Registration
         </h2>
       </div>
       <div className="p-8 text-center">
-        <p className="text-xl font-medium text-mkneutral-700 mb-3">Thank you for joining!</p>
-        <p className="text-mkneutral-500 mb-8">
-          Your membership registration has been successfully processed. You can now access your dashboard and benefits.
+        <p className="text-xl font-medium text-mkneutral-700 mb-3">
+          Thank you for joining!
         </p>
-        
+        <p className="text-mkneutral-500 mb-8">
+          Your membership registration has been successfully processed. You can
+          now access your dashboard and benefits.
+        </p>
+
         <div className="max-w-md mx-auto p-6 bg-cream-50 rounded-xl mb-8">
-          <h3 className="text-lg font-medium text-mkneutral-800 mb-4">Registration Details</h3>
+          <h3 className="text-lg font-medium text-mkneutral-800 mb-4">
+            Registration Details
+          </h3>
           <div className="space-y-2 text-left">
             <div className="flex justify-between">
               <span className="text-mkneutral-500">Name:</span>
-              <span className="font-medium">{formData.firstName} {formData.lastName}</span>
+              <span className="font-medium">
+                {formData.firstName} {formData.lastName}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-mkneutral-500">Email:</span>
@@ -38,16 +50,28 @@ const RegistrationSuccess = ({ formData, handleLoginAfterPayment }: Registration
             </div>
             <div className="flex justify-between">
               <span className="text-mkneutral-500">Membership Type:</span>
-              <span className="font-medium">{formData.membershipType}</span>
+              <span className="font-medium">Basic</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mkneutral-500">Payment Method:</span>
               <span className="font-medium">{formData.paymentMethod}</span>
             </div>
+            <div className="flex justify-between">
+              <span className="text-mkneutral-500">Payment Ref:</span>
+              <span className="font-medium">
+                {paymentVerificationData.reference}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-mkneutral-500">Payment Status:</span>
+              <span className="font-medium">
+                {paymentVerificationData.status}
+              </span>
+            </div>
           </div>
         </div>
-        
-        <Button 
+
+        <Button
           onClick={handleLoginAfterPayment}
           className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-2.5 rounded-full"
         >
