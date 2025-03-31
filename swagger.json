@@ -8386,7 +8386,7 @@
       },
       "Race": {
         "enum": [
-          "African",
+          "Black",
           "White",
           "Coloured",
           "Indian",
@@ -9188,25 +9188,53 @@
             "type": "string",
             "nullable": true
           },
+          "addressLine2": {
+            "type": "string",
+            "nullable": true
+          },
           "membershipType": {
             "type": "string",
             "nullable": true
           },
           "membershipNumber": {
             "type": "string",
-            "nullable": true
+            "format": "uuid"
           },
           "photoUrl": {
             "type": "string",
             "nullable": true
           },
+          "provinceId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "province": {
+            "type": "string",
+            "nullable": true
+          },
+          "municipalityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "municipality": {
+            "type": "string",
+            "nullable": true
+          },
+          "wardId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "wardNumber": {
             "type": "string",
             "nullable": true
           },
           "ward": {
             "type": "string",
             "nullable": true
+          },
+          "votingStationId": {
+            "type": "string",
+            "format": "uuid"
           },
           "votingStation": {
             "type": "string",

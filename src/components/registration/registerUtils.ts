@@ -7,7 +7,7 @@ export const devModeData = {
   lastName: "Sukwana",
   dateOfBirth: "2000-01-02",
   gender: "Male",
-  race: "African",
+  race: "Black",
   language: "IsiXhosa",
   nationality: "South Africa",
   employmentStatus: "Unemployed",

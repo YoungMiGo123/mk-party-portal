@@ -4,12 +4,7 @@ import { motion } from "framer-motion";
 import { Loader2, AlertCircle } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
-import { useAuth } from "@/store/authStore";
+import { useAuth, User } from "@/store/authStore";
 import { mockMembers } from "@/lib/mockData";
 import { usePostLoginRequest } from "@/api/auth/login";
 import { usePostSendLoginOTPRequest } from "@/api/auth/sendOtp";
@@ -36,138 +31,24 @@ const Login = () => {
     contactInfo: "",
   });
 
-  // const [errors, setErrors] = useState<Record<string, string>>({});
-  // const [isLoading, setIsLoading] = useState(false);
-
-  // Handle form submission
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   // Validate form
-  //   const newErrors: Record<string, string> = {};
-
-  //   if (!formData.idNumber) {
-  //     newErrors.idNumber = "ID Number is required";
-  //   } else if (formData.idNumber.length !== 13) {
-  //     newErrors.idNumber = "ID Number must be 13 digits";
-  //   }
-
-  //   if (!formData.contactInfo) {
-  //     newErrors.contactInfo = "Email or Cellphone is required";
-  //   }
-
-  //   setErrors(newErrors);
-
-  //   // If no errors, attempt login
-  //   if (Object.keys(newErrors).length === 0) {
-  //     setIsLoading(true);
-
-  //     // loginRequest
-  //     //   .mutateAsync({
-  //     //     email: formData.contactInfo,
-  //     //     idnumber: formData.idNumber,
-  //     //     cellphone: formData.contactInfo,
-  //     //   })
-  //     //   .then((response) => {
-  //     //     const token = response.data.token;
-  //     //     const user = response.data.userProfile;
-  //     //     login(user, token.token);
-  //     //     toast({
-  //     //       title: "Login Successful",
-  //     //       description: `Welcome back, ${user.fullName}!`,
-  //     //     });
-  //     //     navigate("/dashboard");
-  //     //   })
-  //     //   .catch((error) => {
-  //     //     toast({
-  //     //       title: "Login Failed",
-  //     //       description: "Invalid ID Number or contact information.",
-  //     //       variant: "destructive",
-  //     //     });
-  //     //     setErrors({
-  //     //       form: "Invalid ID Number or contact information. Please try again.",
-  //     //     });
-  //     //   })
-  //     //   .finally(() => {
-  //     //     setIsLoading(false);
-  //     //   });
-
-  //     // Simulate API call with mock data
-  //     setTimeout(() => {
-  //       // Find member with matching ID and email/phone
-  //       const foundMember = mockMembers.find(
-  //         (member) =>
-  //           member.idNumber === formData.idNumber &&
-  //           (member.email === formData.contactInfo ||
-  //             member.cellphone === formData.contactInfo)
-  //       );
-
-  //       if (foundMember) {
-  //         // Login successful
-  //         login(foundMember, "dummy-token");
-
-  //         toast({
-  //           title: "Login Successful",
-  //           description: `Welcome back, ${foundMember.name}!`,
-  //         });
-
-  //         navigate("/dashboard");
-  //       } else {
-  //         // Login failed
-  //         toast({
-  //           title: "Login Failed",
-  //           description: "Invalid ID Number or contact information.",
-  //           variant: "destructive",
-  //         });
-
-  //         setErrors({
-  //           form: "Invalid ID Number or contact information. Please try again.",
-  //         });
-  //       }
-
-  //       setIsLoading(false);
-  //     }, 1500);
-  //   }
-  // };
-
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({ ...prev, [name]: value }));
-
-  //   if (errors[name]) {
-  //     setErrors((prev) => {
-  //       const newErrors = { ...prev };
-  //       delete newErrors[name];
-  //       return newErrors;
-  //     });
-  //   }
-  // };
-
   const handleLoginFormSubmission = (data: typeof formData) => {
-    login(
-      { ...(devModeUserFakeData as any), id: "jdsjhjdsjjj" },
-      "dummy-token"
-    );
-    setCurrentStep(LoginStep.OTPForm);
-
-    // REAL ACTUAL CODE
-    // setFormData(data);
-    // sendLoginOTPRequest
-    //   .mutateAsync({ email: data.contactInfo })
-    //   .then((res) => {
-    //     setCurrentStep(LoginStep.OTPForm);
-    //     toast({
-    //       title: "OTP Sent",
-    //       description: "We've sent a verification code to your device",
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     toast({
-    //       title: "Error",
-    //       description: "An error occurred while sending the OTP.",
-    //       variant: "destructive",
-    //     });
-    //   });
+    setFormData(data);
+    sendLoginOTPRequest
+      .mutateAsync({ email: data.contactInfo })
+      .then((res) => {
+        setCurrentStep(LoginStep.OTPForm);
+        toast({
+          title: "OTP Sent",
+          description: "We've sent a verification code to your device",
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Error",
+          description: "An error occurred while sending the OTP.",
+          variant: "destructive",
+        });
+      });
   };
 
   const handleResendOTP = () => {
@@ -185,29 +66,34 @@ const Login = () => {
   };
 
   const handleOTPFormSubmission = (otp: string) => {
-    navigate("/dashboard");
+    loginRequest
+      .mutateAsync({ email: formData.contactInfo, otpToken: otp })
+      .then((res) => {
+        const token = res?.data?.token;
+        const user = res?.data?.user;
+        if (!user || !token?.token) {
+          toast({
+            title: "Error",
+            description: "Something went wrong.",
+            variant: "destructive",
+          });
+          return;
+        }
 
-    //REAL ACTUAL CODE
-
-    // loginRequest
-    //   .mutateAsync({ email: formData.contactInfo, otpToken: otp })
-    //   .then((res) => {
-    //     const token = res.data.token;
-    //     const user = res.data.userProfile;
-    //     login(user, token.token);
-    //     toast({
-    //       title: "Login Successful",
-    //       description: `Welcome back, ${user.fullName}!`,
-    //     });
-    //     navigate("/dashboard");
-    //   })
-    //   .catch((error) => {
-    //     toast({
-    //       title: "Error",
-    //       description: "Invalid OTP. Please try again.",
-    //       variant: "destructive",
-    //     });
-    //   });
+        login(user as User, token.token);
+        toast({
+          title: "Login Successful",
+          description: `Welcome back, ${user.fullName}!`,
+        });
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        toast({
+          title: "Error",
+          description: "Invalid OTP. Please try again.",
+          variant: "destructive",
+        });
+      });
   };
 
   return (
@@ -243,7 +129,7 @@ const Login = () => {
                 onBack={() => setCurrentStep(LoginStep.LoginForm)}
                 onSubmit={handleOTPFormSubmission}
                 onResendOTP={handleResendOTP}
-                blockCount={4}
+                blockCount={6}
                 isLoading={loginRequest.isPending}
                 title="Enter Verification Code"
                 description="We've sent a code to your device"
