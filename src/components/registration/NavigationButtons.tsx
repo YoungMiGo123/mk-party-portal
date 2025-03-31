@@ -1,63 +1,87 @@
-
-import { ChevronLeft, ChevronRight, DollarSign, Loader2, CheckCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Loader2, CheckCircle } from "lucide-react";
 
-interface NavigationButtonsProps {
-  currentStep: number;
-  totalSteps: number;
-  handlePrevious: () => void;
-  handleNext: () => void;
+export interface NavigationButtonsProps {
   isLoading: boolean;
-  isPaymentComplete?: boolean;
-  handleCompleteRegistration?: () => void;
+  hasPrevious: boolean;
+  customPrevText?: string;
+  handlePrevious: () => void;
+  hasNext: boolean;
+  customNextText?: string;
+  handleNext: () => void;
+  hasSubmit: boolean;
+  submitText?: string;
+  submitTextLoading?: string;
+  submitIcon?: React.ReactNode;
+  handleSubmit: () => void;
 }
 
-const NavigationButtons = ({
-  currentStep,
-  totalSteps,
-  handlePrevious,
-  handleNext,
-  isLoading,
-  isPaymentComplete = false,
-  handleCompleteRegistration,
-}: NavigationButtonsProps) => {
+const NavigationButtons = (props: NavigationButtonsProps) => {
+  const {
+    isLoading = false,
+    hasPrevious = true,
+    customPrevText,
+    handlePrevious,
+    hasNext = true,
+    customNextText,
+    handleNext,
+    hasSubmit = true,
+    submitText = "Submit",
+    submitTextLoading = "Submitting",
+    submitIcon = <CheckCircle className="ml-2 h-4 w-4" />,
+    handleSubmit,
+  } = props;
+
+  const applyJustifyBetween =
+    (hasPrevious && hasNext) || (hasPrevious && hasSubmit);
   return (
-    <div className="mt-8 flex justify-between">
-      {currentStep > 0 ? (
+    <div
+      className={cn(
+        "mt-8 flex",
+        applyJustifyBetween ? "justify-between" : "justify-end"
+      )}
+    >
+      {hasPrevious && (
         <Button
           type="button"
+          disabled={isLoading}
           onClick={handlePrevious}
           className="bg-mkneutral-100 text-mkneutral-700 hover:bg-mkneutral-200"
-          disabled={isLoading}
         >
-          <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+          <ChevronLeft className="mr-2 h-4 w-4" />{" "}
+          {customPrevText ?? "Previous"}
         </Button>
-      ) : (
-        <div></div> // Empty div to maintain layout
       )}
-      
-      {currentStep < totalSteps - 1 ? (
+
+      {hasNext && (
         <Button
           type="button"
           onClick={handleNext}
           className="bg-primary-600 hover:bg-primary-700 text-white"
         >
-          Next <ChevronRight className="ml-2 h-4 w-4" />
+          {customNextText ?? "Next"} <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
-      ) : (
+      )}
+
+      {hasSubmit && (
         <Button
-          type="button" 
-          onClick={handleCompleteRegistration || handleNext}
+          type="button"
+          onClick={handleSubmit}
           disabled={isLoading}
           className="bg-primary-600 hover:bg-primary-700 text-white"
         >
-          {isLoading ? (
+          {isLoading && (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+              {submitTextLoading}
             </>
-          ) : (
+          )}
+
+          {!isLoading && (
             <>
-              Complete Registration <DollarSign className="ml-2 h-4 w-4" />
+              {submitText}
+              {submitIcon}
             </>
           )}
         </Button>

@@ -1,6 +1,5 @@
-
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type User = {
   id: string;
@@ -21,8 +20,14 @@ export type User = {
   membershipType: string;
   membershipNumber: string;
   photoUrl?: string;
+  provinceId?: string;
   province?: string;
+  municipalityId?: string;
+  municipality?: string;
+  wardId?: string;
+  wardName?: string;
   ward?: string;
+  votingStationId?: string;
   votingStation?: string;
   joinDate: string;
 };
@@ -55,7 +60,7 @@ export const useAuth = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-storage',
+      name: "auth-storage",
     }
   )
 );

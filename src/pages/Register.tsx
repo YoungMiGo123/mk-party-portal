@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -8,7 +7,7 @@ const Register = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
-      
+
       <main className="flex-grow pt-20 pb-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
@@ -19,7 +18,7 @@ const Register = () => {
               Complete the registration form below to create your account
             </p>
           </div>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -30,7 +29,7 @@ const Register = () => {
           </motion.div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

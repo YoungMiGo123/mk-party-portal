@@ -1,15 +1,17 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogOut, IdCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/authStore";
+import { usePostLogoutRequest } from "@/api/auth/logout";
 
 const DashboardHeader = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const logoutRegister = usePostLogoutRequest();
 
   const handleLogout = () => {
+    logoutRegister.mutate();
     logout();
     navigate("/login", { replace: true });
   };
@@ -27,7 +29,8 @@ const DashboardHeader = () => {
             Dashboard
           </h1>
           <p className="text-mkneutral-600 mt-2">
-            Welcome back, {user?.name}! Manage your membership and stay connected with the party.
+            Welcome back, {user?.name}! Manage your membership and stay
+            connected with the party.
           </p>
         </div>
         <div className="flex space-x-3">
@@ -37,9 +40,9 @@ const DashboardHeader = () => {
               View Membership Card
             </Button>
           </Link>
-          <Button 
-            variant="ghost" 
-            className="text-mkneutral-700 hover:text-red-600 hover:bg-red-50" 
+          <Button
+            variant="ghost"
+            className="text-mkneutral-700 hover:text-red-600 hover:bg-red-50"
             onClick={handleLogout}
           >
             <LogOut size={16} className="mr-2" />

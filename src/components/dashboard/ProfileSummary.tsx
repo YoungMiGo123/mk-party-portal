@@ -1,7 +1,12 @@
-
 import { motion } from "framer-motion";
 import { CheckCircle, XCircle, Mail } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/store/authStore";
@@ -17,13 +22,13 @@ interface ProfileSummaryProps {
   setActiveTab: (tab: string) => void;
 }
 
-const ProfileSummary = ({ 
-  user, 
-  isExpired, 
-  membershipExpiryDate, 
-  formatDate, 
-  activeTab, 
-  setActiveTab 
+const ProfileSummary = ({
+  user,
+  isExpired,
+  membershipExpiryDate,
+  formatDate,
+  activeTab,
+  setActiveTab,
 }: ProfileSummaryProps) => {
   const { toast } = useToast();
 
@@ -52,33 +57,44 @@ const ProfileSummary = ({
                 <AvatarImage src={user.photoUrl} alt={user.name} />
               ) : (
                 <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                  {user.name.charAt(0)}{user.surname.charAt(0)}
+                  {user.name.charAt(0)}
+                  {user.surname.charAt(0)}
                 </AvatarFallback>
               )}
             </Avatar>
             <div>
-              <div className="font-medium">{user.name} {user.surname}</div>
-              <div className="text-sm text-mkneutral-500">{user.membershipType} Member</div>
+              <div className="font-medium">
+                {user.name} {user.surname}
+              </div>
+              <div className="text-sm text-mkneutral-500">
+                {user.membershipType} Member
+              </div>
               <div className="flex items-center text-sm mt-1">
                 {isExpired ? (
                   <div className="flex items-center text-red-500">
                     <XCircle size={14} className="mr-1" />
-                    <span>Expired on {formatDate(membershipExpiryDate.toISOString())}</span>
+                    <span>
+                      Expired on{" "}
+                      {formatDate(membershipExpiryDate.toISOString())}
+                    </span>
                   </div>
                 ) : (
                   <div className="flex items-center text-green-600">
                     <CheckCircle size={14} className="mr-1" />
-                    <span>Active until {formatDate(membershipExpiryDate.toISOString())}</span>
+                    <span>
+                      Active until{" "}
+                      {formatDate(membershipExpiryDate.toISOString())}
+                    </span>
                   </div>
                 )}
               </div>
             </div>
           </div>
-          
+
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-mkneutral-500">Membership No:</span>
-              <span className="font-medium">{user.membershipNumber}</span>
+              <span className="text-mkneutral-500">Membership:</span>
+              <span className="font-medium">{user.membershipType}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mkneutral-500">Ward:</span>
@@ -95,13 +111,18 @@ const ProfileSummary = ({
           </div>
         </CardContent>
         <CardFooter className="pt-0">
-          <Button variant="outline" size="sm" className="w-full" onClick={connectWhatsApp}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={connectWhatsApp}
+          >
             <Mail size={14} className="mr-2" />
             Connect on WhatsApp
           </Button>
         </CardFooter>
       </Card>
-      
+
       <DashboardMenu activeTab={activeTab} setActiveTab={setActiveTab} />
     </motion.div>
   );
